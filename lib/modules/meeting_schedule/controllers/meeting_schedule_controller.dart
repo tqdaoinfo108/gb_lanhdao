@@ -38,6 +38,7 @@ class MeetingScheduleController extends GetxController {
     required String location,
     required String duration,
     String? organizer,
+    String statusLabel = 'MỚI',
   }) {
     final sectionTitle = _buildSectionTitle(date);
     final targetIndex = sections.indexWhere((s) => s.title == sectionTitle);
@@ -51,7 +52,7 @@ class MeetingScheduleController extends GetxController {
         location: location,
         duration: duration,
         organizer: organizer,
-        statusLabel: 'MỚI',
+        statusLabel: statusLabel,
       ),
     ];
 
@@ -69,6 +70,34 @@ class MeetingScheduleController extends GetxController {
       sections[targetIndex] = updatedSection;
     }
 
+    sections.refresh();
+  }
+
+  void deleteMeeting({
+    required String sectionTitle,
+    required int meetingIndex,
+  }) {
+    final sectionIndex = sections.indexWhere((s) => s.title == sectionTitle);
+    if (sectionIndex == -1) return;
+
+    final section = sections[sectionIndex];
+    if (meetingIndex < 0 || meetingIndex >= section.meetings.length) return;
+
+    final updatedMeetings = List<MeetingScheduleItem>.from(section.meetings)
+      ..removeAt(meetingIndex);
+
+    if (updatedMeetings.isEmpty) {
+      sections.removeAt(sectionIndex);
+      sections.refresh();
+      return;
+    }
+
+    final isToday = section.title == 'HÔM NAY';
+    sections[sectionIndex] = MeetingScheduleSection(
+      title: section.title,
+      subtitle: isToday ? '${updatedMeetings.length} cuộc họp' : section.subtitle,
+      meetings: updatedMeetings,
+    );
     sections.refresh();
   }
 

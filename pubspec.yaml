@@ -47,6 +47,7 @@ dependencies:
 
   # Internationalization (format ngày, số, tiền tệ)
   intl: ^0.19.0
+  flutter_slidable: ^4.0.3
 
 dev_dependencies:
   flutter_test:
