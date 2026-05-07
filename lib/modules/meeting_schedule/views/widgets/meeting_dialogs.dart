@@ -162,7 +162,7 @@ Future<void> showCreateMeetingDialog({
                             time: cleanTime,
                             location: cleanLocation,
                             duration: cleanDuration,
-                            organizer: cleanOrganizer.isEmpty ? null : 'Tổ chức: $cleanOrganizer',
+                            organizer: cleanOrganizer.isEmpty ? null : cleanOrganizer,
                             statusLabel: 'meeting.status_new'.tr,
                           );
                           Navigator.of(dialogContext).pop();
