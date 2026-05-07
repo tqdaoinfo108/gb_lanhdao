@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
 import '../../../core/values/app_colors.dart';
 import '../../../core/values/app_constants.dart';
+import '../../../routes/app_routes.dart';
 import '../../../widgets/app_loading_indicator.dart';
 import '../../../widgets/section_header.dart';
 import 'widgets/home_header.dart';
@@ -195,21 +196,25 @@ class HomeScreen extends GetView<HomeController> {
                 icon: Icons.dashboard_rounded,
                 label: 'Tổng quát',
                 isSelected: true,
+                onTap: () {},
               ),
               _NavItem(
                 icon: Icons.work_outline_rounded,
                 label: 'Nghiệp vụ',
                 isSelected: false,
+                onTap: () => Get.toNamed(AppRoutes.tasks),
               ),
               _NavItem(
                 icon: Icons.chat_bubble_outline_rounded,
                 label: 'Trao đổi',
                 isSelected: false,
+                onTap: () {},
               ),
               _NavItem(
                 icon: Icons.person_outline_rounded,
                 label: 'Cá nhân',
                 isSelected: false,
+                onTap: () {},
               ),
             ],
           ),
@@ -224,11 +229,13 @@ class _NavItem extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool isSelected;
+  final VoidCallback onTap;
 
   const _NavItem({
     required this.icon,
     required this.label,
     required this.isSelected,
+    required this.onTap,
   });
 
   @override
@@ -237,6 +244,7 @@ class _NavItem extends StatelessWidget {
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
+      onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
         child: Column(
