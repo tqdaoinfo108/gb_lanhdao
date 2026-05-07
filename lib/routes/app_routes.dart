@@ -11,6 +11,8 @@ abstract class AppRoutes {
   // Main
   // ---------------------------------------------------------------------------
   static const home = '/home';
+  static const tasks = '/tasks';
+  static const taskDetail = '/task-detail';
 
   // ---------------------------------------------------------------------------
   // Thêm route mới vào đây khi tạo module mới
