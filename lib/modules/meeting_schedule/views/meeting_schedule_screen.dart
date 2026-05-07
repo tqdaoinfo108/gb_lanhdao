@@ -89,7 +89,7 @@ Future<void> _confirmAndDeleteMeeting(
   final confirmed = await showDeleteConfirmDialog(context);
   if (confirmed != true) return;
 
-  Get.find<MeetingScheduleController>().deleteMeeting(
+  controller.deleteMeeting(
     sectionTitle: sectionTitle,
     meetingIndex: meetingIndex,
   );
