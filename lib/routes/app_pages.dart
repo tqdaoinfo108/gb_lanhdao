@@ -1,6 +1,8 @@
 import 'package:get/get.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_screen.dart';
+import '../modules/meeting_schedule/bindings/meeting_schedule_binding.dart';
+import '../modules/meeting_schedule/views/meeting_schedule_screen.dart';
 import 'app_routes.dart';
 
 /// Đăng ký tất cả GetPage ở đây.
@@ -19,6 +21,12 @@ class AppPages {
       page: () => const HomeScreen(),
       binding: HomeBinding(),
       transition: Transition.fadeIn,
+    ),
+    GetPage(
+      name: AppRoutes.meetingSchedule,
+      page: () => const MeetingScheduleScreen(),
+      binding: MeetingScheduleBinding(),
+      transition: Transition.rightToLeft,
     ),
 
     // ------------------------------------------------------------------

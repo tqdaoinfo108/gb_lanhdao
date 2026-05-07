@@ -7,8 +7,13 @@ import '../../../../data/models/dashboard_models.dart';
 /// Grid 2x2 hiển thị 4 KPI cards.
 class KpiSummaryGrid extends StatelessWidget {
   final List<KpiSummary> items;
+  final ValueChanged<KpiSummary>? onItemTap;
 
-  const KpiSummaryGrid({super.key, required this.items});
+  const KpiSummaryGrid({
+    super.key,
+    required this.items,
+    this.onItemTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +27,10 @@ class KpiSummaryGrid extends StatelessWidget {
         childAspectRatio: 0.92,
       ),
       itemCount: items.length,
-      itemBuilder: (context, index) => _KpiCard(kpi: items[index]),
+      itemBuilder: (context, index) => _KpiCard(
+        kpi: items[index],
+        onTap: onItemTap == null ? null : () => onItemTap!(items[index]),
+      ),
     );
   }
 }
@@ -30,71 +38,79 @@ class KpiSummaryGrid extends StatelessWidget {
 /// Card KPI đơn lẻ.
 class _KpiCard extends StatelessWidget {
   final KpiSummary kpi;
+  final VoidCallback? onTap;
 
-  const _KpiCard({required this.kpi});
+  const _KpiCard({
+    required this.kpi,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: AppColors.cardWhite,
-        borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
-        boxShadow: [AppColors.lightShadow],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Icon
-          _buildIcon(),
-          const SizedBox(height: 10),
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: AppColors.cardWhite,
+          borderRadius: BorderRadius.circular(AppConstants.radiusMedium),
+          boxShadow: [AppColors.lightShadow],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Icon
+            _buildIcon(),
+            const SizedBox(height: 10),
 
-          // Title
-          Text(
-            kpi.title,
-            style: AppTextStyles.label.copyWith(
-              color: AppColors.textSecondary,
-              letterSpacing: 0.8,
-            ),
-          ),
-          const SizedBox(height: 4),
-
-          // Value + unit
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.baseline,
-            textBaseline: TextBaseline.alphabetic,
-            children: [
-              Text(
-                kpi.value,
-                style: AppTextStyles.h2.copyWith(
-                  fontWeight: FontWeight.w800,
-                  fontSize: 26,
-                ),
+            // Title
+            Text(
+              kpi.title,
+              style: AppTextStyles.label.copyWith(
+                color: AppColors.textSecondary,
+                letterSpacing: 0.8,
               ),
-              Text(
-                kpi.unit,
-                style: AppTextStyles.bodyMedium.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 4),
-
-          // Description
-          Flexible(
-            child: Text(
-              kpi.description,
-              style: AppTextStyles.caption.copyWith(fontSize: 11),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
             ),
-          ),
-          const SizedBox(height: 6),
+            const SizedBox(height: 4),
 
-          // Trend
-          if (kpi.trend != null) _buildTrend(),
-        ],
+            // Value + unit
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.baseline,
+              textBaseline: TextBaseline.alphabetic,
+              children: [
+                Text(
+                  kpi.value,
+                  style: AppTextStyles.h2.copyWith(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 26,
+                  ),
+                ),
+                Text(
+                  kpi.unit,
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 4),
+
+            // Description
+            Flexible(
+              child: Text(
+                kpi.description,
+                style: AppTextStyles.caption.copyWith(fontSize: 11),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            const SizedBox(height: 6),
+
+            // Trend
+            if (kpi.trend != null) _buildTrend(),
+          ],
+        ),
       ),
     );
   }

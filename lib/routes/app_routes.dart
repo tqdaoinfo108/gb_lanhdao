@@ -11,6 +11,7 @@ abstract class AppRoutes {
   // Main
   // ---------------------------------------------------------------------------
   static const home = '/home';
+  static const meetingSchedule = '/meeting-schedule';
 
   // ---------------------------------------------------------------------------
   // Thêm route mới vào đây khi tạo module mới
