@@ -5,6 +5,8 @@ import '../modules/tasks/bindings/tasks_binding.dart';
 import '../modules/tasks/views/tasks_screen.dart';
 import '../modules/tasks/bindings/task_detail_binding.dart';
 import '../modules/tasks/views/task_detail_screen.dart';
+import '../modules/meeting_schedule/bindings/meeting_schedule_binding.dart';
+import '../modules/meeting_schedule/views/meeting_schedule_screen.dart';
 import 'app_routes.dart';
 
 /// Đăng ký tất cả GetPage ở đây.
@@ -42,6 +44,12 @@ class AppPages {
       name: AppRoutes.taskDetail,
       page: () => const TaskDetailScreen(),
       binding: TaskDetailBinding(),
+      transition: Transition.rightToLeft,
+    ),
+    GetPage(
+      name: AppRoutes.meetingSchedule,
+      page: () => const MeetingScheduleScreen(),
+      binding: MeetingScheduleBinding(),
       transition: Transition.rightToLeft,
     ),
 

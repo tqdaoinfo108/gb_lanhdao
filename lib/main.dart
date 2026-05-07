@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'core/localization/app_translations.dart';
 import 'core/theme/app_theme.dart';
 import 'routes/app_pages.dart';
 
@@ -27,6 +28,7 @@ class MyApp extends StatelessWidget {
       // Locale (nếu cần i18n sau này)
       locale: const Locale('vi', 'VN'),
       fallbackLocale: const Locale('vi', 'VN'),
+      translations: AppTranslations(),
 
       // Default transition
       defaultTransition: Transition.fadeIn,

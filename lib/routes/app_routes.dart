@@ -5,7 +5,7 @@ abstract class AppRoutes {
   // Auth
   // ---------------------------------------------------------------------------
   static const splash = '/splash';
-  static const login  = '/login';
+  static const login = '/login';
 
   // ---------------------------------------------------------------------------
   // Main
@@ -13,6 +13,7 @@ abstract class AppRoutes {
   static const home = '/home';
   static const tasks = '/tasks';
   static const taskDetail = '/task-detail';
+  static const meetingSchedule = '/meeting-schedule';
 
   // ---------------------------------------------------------------------------
   // Thêm route mới vào đây khi tạo module mới

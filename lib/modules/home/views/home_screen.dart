@@ -3,6 +3,10 @@ import 'package:get/get.dart';
 import '../controllers/home_controller.dart';
 import '../../../core/values/app_colors.dart';
 import '../../../core/values/app_constants.dart';
+import '../../../data/models/dashboard_models.dart';
+import '../../../modules/meeting_schedule/bindings/meeting_schedule_binding.dart';
+import '../../../modules/meeting_schedule/views/meeting_schedule_screen.dart';
+import '../../../routes/app_routes.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/app_loading_indicator.dart';
 import '../../../widgets/section_header.dart';
@@ -52,7 +56,9 @@ class HomeScreen extends GetView<HomeController> {
             slivers: [
               // Safe area padding
               SliverToBoxAdapter(
-                child: SizedBox(height: MediaQuery.of(context).padding.top + 12),
+                child: SizedBox(
+                  height: MediaQuery.of(context).padding.top + 12,
+                ),
               ),
 
               // Header
@@ -80,7 +86,10 @@ class HomeScreen extends GetView<HomeController> {
                   horizontal: AppConstants.paddingMedium,
                 ),
                 sliver: SliverToBoxAdapter(
-                  child: KpiSummaryGrid(items: controller.kpiSummaries),
+                  child: KpiSummaryGrid(
+                    items: controller.kpiSummaries,
+                    onItemTap: _onTapKpi,
+                  ),
                 ),
               ),
 
@@ -156,7 +165,7 @@ class HomeScreen extends GetView<HomeController> {
                     meetings: controller.meetings,
                     totalCount: controller.totalMeetings.value,
                     onViewAll: () {
-                      // TODO: navigate to full schedule
+                      _goToMeetingSchedule();
                     },
                   ),
                 ),
@@ -221,6 +230,24 @@ class HomeScreen extends GetView<HomeController> {
         ),
       ),
     );
+  }
+
+  void _onTapKpi(KpiSummary kpi) {
+    if (kpi.iconType == KpiIconType.meeting) {
+      _goToMeetingSchedule();
+    }
+  }
+
+  void _goToMeetingSchedule() {
+    try {
+      Get.toNamed(AppRoutes.meetingSchedule);
+    } catch (_) {
+      // Fallback giúp mở màn hình ngay cả khi named routes chưa được hot restart.
+      Get.to(
+        () => const MeetingScheduleScreen(),
+        binding: MeetingScheduleBinding(),
+      );
+    }
   }
 }
 
