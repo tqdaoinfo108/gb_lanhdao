@@ -152,7 +152,10 @@ class TasksScreen extends GetView<TasksController> {
                         padding: const EdgeInsets.fromLTRB(14, 0, 14, 96),
                         itemCount: data.length,
                         separatorBuilder: (context, index) => const SizedBox(height: 12),
-                        itemBuilder: (context, index) => TaskCardWidget(task: data[index]),
+                        itemBuilder: (context, index) => TaskCardWidget(
+                          task: data[index],
+                          onDelete: () => controller.deleteTask(data[index].id),
+                        ),
                       );
                     }),
                   ),

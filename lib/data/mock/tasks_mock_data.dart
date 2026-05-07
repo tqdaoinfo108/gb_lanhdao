@@ -7,6 +7,7 @@ final List<Task> tasksMockData = [
     department: 'Địa chính',
     owner: 'Lê Văn Hùng',
     progress: 0.57,
+    progressFromSubTasks: true,
     date: DateTime(2026, 4, 15),
     statusLabel: 'CHẬM TIẾN ĐỘ',
     avatarUrls: [
@@ -85,6 +86,7 @@ final List<Task> tasksMockData = [
     department: 'Tư pháp',
     owner: 'Bùi Thị Hoa',
     progress: 0.85,
+    progressFromSubTasks: true,
     date: DateTime(2026, 6, 30),
     statusLabel: 'ĐÚNG TIẾN ĐỘ',
     avatarUrls: ['https://i.pravatar.cc/150?img=14'],
@@ -128,6 +130,7 @@ final List<Task> tasksMockData = [
     department: 'Y tế',
     owner: 'Võ Thanh Tùng',
     progress: 1.0,
+    progressFromSubTasks: true,
     date: DateTime(2026, 3, 28),
     statusLabel: 'HOÀN THÀNH',
     avatarUrls: [
@@ -177,6 +180,7 @@ final List<Task> tasksMockData = [
     department: 'Kế hoạch',
     owner: 'Phạm Minh Hoàng',
     progress: 0.5,
+    progressFromSubTasks: true,
     date: DateTime(2026, 5, 20),
     statusLabel: 'CÓ RỦI RO',
     avatarUrls: ['https://i.pravatar.cc/150?img=25'],

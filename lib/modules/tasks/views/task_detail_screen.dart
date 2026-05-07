@@ -194,6 +194,7 @@ class TaskDetailScreen extends GetView<TaskDetailController> {
         return SubTaskCard(
           subTask: subTask,
           onStatusChanged: (status) => controller.updateSubTaskStatus(subTask, status),
+          onDelete: () => controller.deleteSubTask(subTask),
         );
       },
     );

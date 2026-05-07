@@ -67,6 +67,10 @@ class TasksController extends GetxController {
     tasks.insert(0, task);
   }
 
+  void deleteTask(String taskId) {
+    tasks.removeWhere((task) => task.id == taskId);
+  }
+
   String getTabLabel(String type) {
     int count = 0;
     if (type == 'Tất cả') {

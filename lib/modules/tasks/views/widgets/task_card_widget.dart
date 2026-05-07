@@ -6,8 +6,9 @@ import 'package:percent_indicator/linear_percent_indicator.dart';
 
 class TaskCardWidget extends StatelessWidget {
   final Task task;
+  final VoidCallback onDelete;
 
-  const TaskCardWidget({super.key, required this.task});
+  const TaskCardWidget({super.key, required this.task, required this.onDelete});
 
   Color _statusColor(String label) {
     final l = label.toLowerCase();
@@ -21,7 +22,7 @@ class TaskCardWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accent = _statusColor(task.statusLabel);
-    final progressColor = task.progressColor;
+    final progressColor = accent;
 
     return Container(
       decoration: BoxDecoration(
@@ -72,9 +73,28 @@ class TaskCardWidget extends StatelessWidget {
                   ),
                 ),
                 const Spacer(),
-                const Padding(
-                  padding: EdgeInsets.only(top: 2),
-                  child: Icon(Icons.more_vert, size: 20, color: Color(0xFF8A93A2)),
+                PopupMenuButton<String>(
+                  padding: EdgeInsets.zero,
+                  icon: const Icon(Icons.more_vert, size: 20, color: Color(0xFF8A93A2)),
+                  offset: const Offset(0, 34),
+                  onSelected: (value) {
+                    if (value == 'delete') {
+                      onDelete();
+                    }
+                  },
+                  itemBuilder: (context) => [
+                    const PopupMenuItem<String>(
+                      value: 'delete',
+                      child: Text(
+                        'Xóa',
+                        style: TextStyle(
+                          color: Color(0xFFEF4444),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
