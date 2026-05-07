@@ -1,6 +1,10 @@
 import 'package:get/get.dart';
 import '../modules/home/bindings/home_binding.dart';
 import '../modules/home/views/home_screen.dart';
+import '../modules/tasks/bindings/tasks_binding.dart';
+import '../modules/tasks/views/tasks_screen.dart';
+import '../modules/tasks/bindings/task_detail_binding.dart';
+import '../modules/tasks/views/task_detail_screen.dart';
 import '../modules/meeting_schedule/bindings/meeting_schedule_binding.dart';
 import '../modules/meeting_schedule/views/meeting_schedule_screen.dart';
 import 'app_routes.dart';
@@ -21,6 +25,26 @@ class AppPages {
       page: () => const HomeScreen(),
       binding: HomeBinding(),
       transition: Transition.fadeIn,
+    ),
+
+    // ------------------------------------------------------------------
+    // Tasks (Giao việc)
+    // ------------------------------------------------------------------
+    GetPage(
+      name: AppRoutes.tasks,
+      page: () => const TasksScreen(),
+      binding: TasksBinding(),
+      transition: Transition.fadeIn,
+    ),
+
+    // ------------------------------------------------------------------
+    // Task Detail (Chi tiết công việc)
+    // ------------------------------------------------------------------
+    GetPage(
+      name: AppRoutes.taskDetail,
+      page: () => const TaskDetailScreen(),
+      binding: TaskDetailBinding(),
+      transition: Transition.rightToLeft,
     ),
     GetPage(
       name: AppRoutes.meetingSchedule,
