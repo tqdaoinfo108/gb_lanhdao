@@ -5,8 +5,9 @@ import 'package:gb_lanhdao/data/models/task_model.dart';
 class SubTaskCard extends StatelessWidget {
   final SubTask subTask;
   final Function(SubTaskStatus) onStatusChanged;
+  final VoidCallback onDelete;
 
-  const SubTaskCard({super.key, required this.subTask, required this.onStatusChanged});
+  const SubTaskCard({super.key, required this.subTask, required this.onStatusChanged, required this.onDelete});
 
   @override
   Widget build(BuildContext context) {
@@ -144,16 +145,16 @@ class SubTaskCard extends StatelessWidget {
           IconCount(icon: Icons.chat_bubble_outline, count: subTask.commentCount),
           const SizedBox(width: 12),
           IconCount(icon: Icons.attach_file, count: subTask.attachmentCount),
-        ] else ...[
+          const SizedBox(width: 8),
           IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.chat_bubble_outline, size: 20, color: Color(0xFF9CA3AF)),
+            onPressed: onDelete,
+            icon: const Icon(Icons.delete_outline, size: 20, color: Color(0xFF9CA3AF)),
             constraints: const BoxConstraints(),
             padding: const EdgeInsets.all(4),
           ),
-          const SizedBox(width: 8),
+        ] else ...[
           IconButton(
-            onPressed: () {},
+            onPressed: onDelete,
             icon: const Icon(Icons.delete_outline, size: 20, color: Color(0xFF9CA3AF)),
             constraints: const BoxConstraints(),
             padding: const EdgeInsets.all(4),

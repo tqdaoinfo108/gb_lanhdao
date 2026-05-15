@@ -35,6 +35,11 @@ class SubTask {
   final bool isLate;
   final int commentCount;
   final int attachmentCount;
+  final String? category;
+  final String? department;
+  final int? kpiCurrent;
+  final int? kpiTotal;
+  final String? kpiUnit;
 
   SubTask({
     required this.id,
@@ -46,6 +51,11 @@ class SubTask {
     this.isLate = false,
     this.commentCount = 0,
     this.attachmentCount = 0,
+    this.category,
+    this.department,
+    this.kpiCurrent,
+    this.kpiTotal,
+    this.kpiUnit,
   });
 
   bool get isDone => status == SubTaskStatus.hoanThanh;
@@ -58,6 +68,7 @@ class Task {
   final String department;
   final String owner;
   final double progress;
+  final bool progressFromSubTasks;
   final DateTime date;
   final String statusLabel;
   final List<String> avatarUrls;
@@ -74,26 +85,31 @@ class Task {
     required this.department,
     required this.owner,
     required this.progress,
+    this.progressFromSubTasks = false,
     required this.date,
     required this.statusLabel,
     required this.avatarUrls,
     this.assignees = const [],
-    this.subTasks = const [],
+    List<SubTask>? subTasks,
     this.ownerAvatar,
     this.kpiCurrent,
     this.kpiTotal,
     this.kpiUnit,
-  });
+  }) : subTasks = subTasks ?? [];
 
   String get formattedDate => DateFormat('dd/MM/yyyy').format(date);
 
   int get doneSubTasks => subTasks.where((s) => s.isDone).length;
   int get lateSubTasks => subTasks.where((s) => s.isLate || s.status == SubTaskStatus.treLhan).length;
   
-  // Logic đồng bộ: Ưu tiên tính theo subtasks, nếu không có thì lấy progress cứng
-  double get displayProgress => subTasks.isNotEmpty 
-      ? (doneSubTasks / subTasks.length) 
-      : progress;
+  // Ưu tiên tiến độ theo subtasks khi task được quản lý theo checklist.
+  double get displayProgress {
+    if (progressFromSubTasks) {
+      if (subTasks.isEmpty) return 0.0;
+      return doneSubTasks / subTasks.length;
+    }
+    return progress;
+  }
 
   Color get progressColor {
     final status = statusLabel.toLowerCase();

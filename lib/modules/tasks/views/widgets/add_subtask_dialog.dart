@@ -5,7 +5,6 @@ import 'package:gb_lanhdao/data/models/task_model.dart';
 import 'package:gb_lanhdao/modules/tasks/controllers/task_detail_controller.dart';
 import 'package:gb_lanhdao/modules/tasks/views/widgets/form_widgets.dart';
 import 'package:gb_lanhdao/modules/tasks/views/widgets/dropdown_widgets.dart';
-import 'package:gb_lanhdao/modules/tasks/views/widgets/dropdown_widgets.dart';
 
 class AddSubTaskDialog extends StatefulWidget {
   final String parentTaskTitle;
@@ -27,13 +26,7 @@ class _AddSubTaskDialogState extends State<AddSubTaskDialog> {
   SubTaskStatus selectedStatus = SubTaskStatus.chuaLam;
 
   void _handleSave() {
-    if (_formKey.currentState!.validate()) {
-      if (selectedDate == null) {
-        Get.snackbar('Thông báo', 'Vui lòng chọn hạn chót',
-          backgroundColor: Colors.orange, colorText: Colors.white);
-        return;
-      }
-
+    if (_formKey.currentState!.validate() && selectedDate != null) {
       final newSubTask = SubTask(
         id: 'ST${DateTime.now().millisecondsSinceEpoch}',
         title: titleController.text,
@@ -49,173 +42,78 @@ class _AddSubTaskDialogState extends State<AddSubTaskDialog> {
       }
 
       Navigator.of(context).pop();
-      Get.snackbar('Thành công', 'Đã thêm nhiệm vụ mới',
-        backgroundColor: Colors.green, colorText: Colors.white,
-        snackPosition: SnackPosition.BOTTOM);
+      Get.snackbar('Thành công', 'Đã thêm công việc mới', backgroundColor: Colors.green, colorText: Colors.white);
+    } else if (selectedDate == null) {
+      Get.snackbar('Thông báo', 'Vui lòng chọn hạn chót', backgroundColor: Colors.orange, colorText: Colors.white);
     }
   }
 
   @override
-  Widget build(BuildContext context) {
-    return Dialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      child: Container(
-        constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.85),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _buildHeader(),
-            const Divider(height: 1),
-            Flexible(child: _buildBody()),
-            const Divider(height: 1),
-            _buildFooter(),
-          ],
-        ),
+  Widget build(BuildContext context) => Dialog(
+    insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+    child: Container(
+      width: double.infinity,
+      constraints: BoxConstraints(maxHeight: Get.height * 0.9),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [_buildHeader(), const Divider(height: 1), Flexible(child: _buildForm()), _buildFooter()],
       ),
-    );
-  }
+    ),
+  );
 
-  Widget _buildHeader() {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 16, 12, 12),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Thêm nhiệm vụ',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF111827)),
-                ),
-                Text(
-                  widget.parentTaskTitle,
-                  style: const TextStyle(fontSize: 13, color: Color(0xFF9CA3AF)),
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-            ),
-          ),
-          IconButton(
-            onPressed: () => Navigator.of(context).pop(),
-            icon: const Icon(Icons.close, color: Color(0xFF9CA3AF)),
-            padding: EdgeInsets.zero,
-            constraints: const BoxConstraints(),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildHeader() => Padding(
+    padding: const EdgeInsets.fromLTRB(20, 16, 12, 8),
+    child: Row(
+      children: [
+        Container(width: 40, height: 40, decoration: BoxDecoration(color: const Color(0xFFEAF1FF), borderRadius: BorderRadius.circular(8)),
+          child: const Icon(Icons.done_all, color: Color(0xFF2F6CE1), size: 24)),
+        const SizedBox(width: 12),
+        Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+          const Text('Thêm công việc', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w700, color: Color(0xFF111827))),
+          Text('Điền đầy đủ thông tin công việc con', style: TextStyle(fontSize: 13, color: Colors.grey[600])),
+        ])),
+        IconButton(onPressed: () => Navigator.of(context).pop(), icon: const Icon(Icons.close, color: Color(0xFF9CA3AF))),
+      ],
+    ),
+  );
 
-  Widget _buildBody() {
-    return SingleChildScrollView(
-      padding: const EdgeInsets.all(20),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const FormLabel('Tên nhiệm vụ', required: true),
-            FormTextField(
-              controller: titleController,
-              hint: 'VD: Rà soát danh sách hộ nghèo',
-              validator: (v) => v!.isEmpty ? 'Không được để trống' : null,
-            ),
-            const SizedBox(height: 16),
-            const FormLabel('Người phụ trách', required: true),
-            FormTextField(
-              controller: assigneeController,
-              hint: 'VD: Nguyễn Văn A',
-              validator: (v) => v!.isEmpty ? 'Không được để trống' : null,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(child: _buildDateField()),
-                const SizedBox(width: 12),
-                Expanded(child: _buildPriorityField()),
-              ],
-            ),
-            const SizedBox(height: 16),
-            const FormLabel('Trạng thái'),
-            _buildStatusField(),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildDateField() {
-    return Column(
+  Widget _buildForm() => SingleChildScrollView(
+    padding: const EdgeInsets.all(20),
+    child: Form(key: _formKey, child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const FormLabel('Hạn chót', required: true),
-        FormDatePicker(
-          controller: dateController,
-          selectedDate: selectedDate,
-          onDateSelected: (date) {
-            setState(() {
-              selectedDate = date;
-              dateController.text = DateFormat('MM/dd/yyyy').format(date);
-            });
-          },
-        ),
+        const FormLabel('Tên công việc', required: true),
+        FormTextField(controller: titleController, hint: 'VD: Rà soát danh sách hộ nghèo', validator: (v) => v!.isEmpty ? 'Không được để trống' : null),
+        const SizedBox(height: 16),
+        Row(children: [Expanded(child: _buildDateField()), const SizedBox(width: 12), Expanded(child: _buildPriorityField())]),
+        const SizedBox(height: 16),
+        const FormLabel('Người phụ trách', required: true),
+        FormTextField(controller: assigneeController, hint: 'VD: Nguyễn Văn A', validator: (v) => v!.isEmpty ? 'Không được để trống' : null),
+        const SizedBox(height: 16),
+        Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const FormLabel('Trạng thái'), _buildStatusField()]),
       ],
-    );
-  }
+    )),
+  );
 
-  Widget _buildPriorityField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const FormLabel('Ưu tiên'),
-        PriorityDropdown(
-          value: selectedPriority,
-          onChanged: (v) => setState(() => selectedPriority = v),
-        ),
-      ],
-    );
-  }
+  Widget _buildDateField() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const FormLabel('Hạn chót', required: true), FormDatePicker(controller: dateController, selectedDate: selectedDate, onDateSelected: (date) => setState(() { selectedDate = date; dateController.text = DateFormat('MM/dd/yyyy').format(date); }))]);
+  Widget _buildPriorityField() => Column(crossAxisAlignment: CrossAxisAlignment.start, children: [const FormLabel('Ưu tiên'), PriorityDropdown(value: selectedPriority, onChanged: (v) => setState(() => selectedPriority = v))]);
+  Widget _buildStatusField() => StatusDropdown(value: selectedStatus, onChanged: (v) => setState(() => selectedStatus = v));
 
-  Widget _buildStatusField() {
-    return StatusDropdown(
-      value: selectedStatus,
-      onChanged: (v) => setState(() => selectedStatus = v),
-    );
-  }
-
-  Widget _buildFooter() {
-    return Padding(
-      padding: const EdgeInsets.all(20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          OutlinedButton(
-            onPressed: () => Navigator.of(context).pop(),
-            style: OutlinedButton.styleFrom(
-              fixedSize: const Size(120, 44),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              side: const BorderSide(color: Color(0xFFE5E7EB)),
-            ),
-            child: const Text('Hủy', style: TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600)),
-          ),
-          const SizedBox(width: 12),
-          ElevatedButton(
-            onPressed: _handleSave,
-            style: ElevatedButton.styleFrom(
-              fixedSize: const Size(140, 44),
-              backgroundColor: const Color(0xFF2F6CE1),
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-              elevation: 0,
-            ),
-            child: const Text('Thêm nhiệm vụ', style: TextStyle(fontWeight: FontWeight.w600)),
-          ),
-        ],
-      ),
-    );
-  }
+  Widget _buildFooter() => Padding(
+    padding: const EdgeInsets.all(20),
+    child: Row(children: [
+      Expanded(child: OutlinedButton(
+        onPressed: () => Navigator.of(context).pop(),
+        style: OutlinedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), side: const BorderSide(color: Color(0xFFE5E7EB))),
+        child: const Text('Hủy bỏ', style: TextStyle(color: Color(0xFF4B5563), fontWeight: FontWeight.w600)),
+      )),
+      const SizedBox(width: 12),
+      Expanded(child: ElevatedButton(
+        onPressed: _handleSave,
+        style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF2F6CE1), foregroundColor: Colors.white, padding: const EdgeInsets.symmetric(vertical: 14), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)), elevation: 0),
+        child: const Row(mainAxisAlignment: MainAxisAlignment.center, children: [Icon(Icons.add, size: 18), SizedBox(width: 4), Text('Thêm công việc', style: TextStyle(fontWeight: FontWeight.w600))]),
+      )),
+    ]),
+  );
 }

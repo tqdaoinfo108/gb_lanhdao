@@ -19,13 +19,7 @@ class TaskDetailController extends GetxController {
 
     subTask.status = newStatus;
 
-    // Cập nhật giao diện chi tiết
-    update();
-
-    // Đồng bộ và làm mới danh sách ở màn hình ngoài
-    if (Get.isRegistered<TasksController>()) {
-      Get.find<TasksController>().tasks.refresh();
-    }
+    _syncTaskChanges();
   }
 
   void addSubTask(SubTask subTask) {
@@ -34,10 +28,20 @@ class TaskDetailController extends GetxController {
     // Thêm vào list subtasks hiện tại
     task!.subTasks.add(subTask);
 
-    // Cập nhật giao diện chi tiết
+    _syncTaskChanges();
+  }
+
+  void deleteSubTask(SubTask subTask) {
+    if (task == null) return;
+
+    task!.subTasks.removeWhere((item) => item.id == subTask.id);
+
+    _syncTaskChanges();
+  }
+
+  void _syncTaskChanges() {
     update();
 
-    // Đồng bộ và làm mới danh sách ở màn hình ngoài
     if (Get.isRegistered<TasksController>()) {
       Get.find<TasksController>().tasks.refresh();
     }
