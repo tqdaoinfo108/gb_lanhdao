@@ -14,6 +14,11 @@ abstract class AppRoutes {
   static const meetingSchedule = '/meeting-schedule';
 
   // ---------------------------------------------------------------------------
+  // Dev/Test
+  // ---------------------------------------------------------------------------
+  static const apiTest = '/api-test';
+
+  // ---------------------------------------------------------------------------
   // Thêm route mới vào đây khi tạo module mới
   // Ví dụ:
   // static const kpiDetail = '/kpi-detail';
