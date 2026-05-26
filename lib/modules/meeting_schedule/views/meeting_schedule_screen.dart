@@ -172,10 +172,15 @@ class MeetingScheduleScreen extends GetView<MeetingScheduleController> {
     if (confirmed != true) return;
 
     try {
-      await Get.find<MeetingScheduleController>().deleteMeeting(
+      await controller.deleteMeeting(
         sectionTitle: sectionTitle,
         meetingIndex: meetingIndex,
       );
+
+      if (controller.errorMessage.isNotEmpty) {
+        throw Exception(controller.errorMessage.value);
+      }
+
       Get.snackbar(
         'meeting.delete.success_title'.tr,
         'meeting.delete.success_content'.tr,

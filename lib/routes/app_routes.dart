@@ -5,12 +5,14 @@ abstract class AppRoutes {
   // Auth
   // ---------------------------------------------------------------------------
   static const splash = '/splash';
-  static const login  = '/login';
+  static const login = '/login';
 
   // ---------------------------------------------------------------------------
   // Main
   // ---------------------------------------------------------------------------
   static const home = '/home';
+  static const tasks = '/tasks';
+  static const taskDetail = '/task-detail';
   static const meetingSchedule = '/meeting-schedule';
 
   // ---------------------------------------------------------------------------

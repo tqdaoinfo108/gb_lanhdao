@@ -116,6 +116,8 @@ class MeetingScheduleController extends GetxController {
     required int meetingIndex,
   }) async {
     try {
+      errorMessage.value = '';
+
       // Tìm booking tương ứng
       final sectionIndex = sections.indexWhere((s) => s.title == sectionTitle);
       if (sectionIndex == -1) return;
