@@ -38,5 +38,3 @@ class SearchBarWidget extends GetView<TasksController> {
     );
   }
 }
-
-

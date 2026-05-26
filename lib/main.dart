@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'core/localization/app_translations.dart';
 import 'core/theme/app_theme.dart';
 import 'routes/app_pages.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Khởi tạo GetStorage
+  await GetStorage.init();
+
   runApp(const MyApp());
 }
 

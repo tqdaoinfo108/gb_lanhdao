@@ -7,5 +7,3 @@ class TasksBinding extends Bindings {
     Get.lazyPut<TasksController>(() => TasksController());
   }
 }
-
-

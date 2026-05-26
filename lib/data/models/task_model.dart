@@ -101,7 +101,7 @@ class Task {
 
   int get doneSubTasks => subTasks.where((s) => s.isDone).length;
   int get lateSubTasks => subTasks.where((s) => s.isLate || s.status == SubTaskStatus.treLhan).length;
-  
+
   // Ưu tiên tiến độ theo subtasks khi task được quản lý theo checklist.
   double get displayProgress {
     if (progressFromSubTasks) {
@@ -115,7 +115,7 @@ class Task {
     final status = statusLabel.toLowerCase();
     if (status.contains('chậm tiến độ')) return const Color(0xFFE74C3C); // Đỏ
     if (status.contains('có rủi ro')) return const Color(0xFFF2994A);   // Cam
-    
+
     double p = displayProgress;
     if (p >= 1.0) return const Color(0xFF20C46A); // Xanh lá
     if (p >= 0.8) return const Color(0xFF2F6CE1); // Xanh dương
