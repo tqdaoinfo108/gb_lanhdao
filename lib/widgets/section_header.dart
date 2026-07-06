@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/values/app_colors.dart';
-import '../../core/values/app_text_styles.dart';
+import '../core/values/app_colors.dart';
+import '../core/values/app_text_styles.dart';
 
 /// Section header dùng chung: Tiêu đề bên trái + nút action bên phải.
 /// Ví dụ: "Hiệu suất tuần này" [Chi tiết >]

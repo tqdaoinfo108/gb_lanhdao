@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/values/app_colors.dart';
-import '../../core/values/app_constants.dart';
+import '../core/values/app_colors.dart';
+import '../core/values/app_constants.dart';
 
 /// Card chuẩn dùng toàn app với shadow và border radius đồng nhất.
 class AppCard extends StatelessWidget {

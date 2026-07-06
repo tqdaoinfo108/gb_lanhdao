@@ -1,0 +1,2221 @@
+﻿<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>AdminSmart Mobile App</title>
+  <style>
+    :root {
+      --device-w: 390px;
+      --device-h: 844px;
+      --bg: oklch(97.6% 0.006 250);
+      --surface: oklch(100% 0 0);
+      --soft: oklch(95.8% 0.01 250);
+      --card-surface: oklch(99.6% 0.003 250);
+      --card-border: oklch(88.5% 0.012 255);
+      --card-shadow: 0 10px 30px oklch(20% 0.02 250 / 0.055);
+      --fg: oklch(22% 0.016 250);
+      --muted: oklch(52% 0.025 255);
+      --border: oklch(89% 0.012 255);
+      --accent: oklch(55% 0.21 262);
+      --accent-soft: oklch(94.5% 0.036 262);
+      --danger: oklch(58% 0.22 28);
+      --danger-soft: oklch(96% 0.035 28);
+      --success: oklch(66% 0.16 150);
+      --success-soft: oklch(96.5% 0.044 150);
+      --warning: oklch(70% 0.15 75);
+      --warning-soft: oklch(97% 0.036 75);
+      --radius-xl: 24px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+      --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", system-ui, sans-serif;
+      --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", system-ui, sans-serif;
+      --font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, Menlo, monospace;
+    }
+    * { box-sizing: border-box; }
+    html {
+      min-height: 100%;
+      background: oklch(18% 0.018 250);
+      color: var(--fg);
+      font-family: var(--font-body);
+      text-rendering: geometricPrecision;
+    }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: oklch(18% 0.018 250);
+    }
+    button,
+    input { font: inherit; }
+    button {
+      border: 0;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .device-frame {
+      width: var(--device-w);
+      height: var(--device-h);
+      padding: 10px;
+      border-radius: 52px;
+      background: oklch(13% 0.01 250);
+      box-shadow: 0 28px 90px oklch(0% 0 0 / 0.38);
+    }
+    .phone {
+      width: 100%;
+      height: 100%;
+      position: relative;
+      overflow: hidden;
+      border-radius: 42px;
+      background: var(--bg);
+    }
+    .dynamic-island {
+      position: absolute;
+      top: 10px;
+      left: 50%;
+      z-index: 50;
+      width: 118px;
+      height: 34px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: oklch(6% 0 0);
+    }
+    .status-bar {
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 8px 24px 0;
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .status-icons {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+    }
+    .signal {
+      width: 18px;
+      height: 12px;
+      background:
+        linear-gradient(var(--fg), var(--fg)) 0 8px / 3px 4px no-repeat,
+        linear-gradient(var(--fg), var(--fg)) 6px 5px / 3px 7px no-repeat,
+        linear-gradient(var(--fg), var(--fg)) 12px 2px / 3px 10px no-repeat;
+    }
+    .battery {
+      width: 24px;
+      height: 12px;
+      border: 1.6px solid var(--fg);
+      border-radius: 4px;
+      padding: 2px;
+      position: relative;
+    }
+    .battery::before {
+      content: "";
+      position: absolute;
+      right: -4px;
+      top: 3px;
+      width: 2px;
+      height: 5px;
+      border-radius: 2px;
+      background: var(--fg);
+    }
+    .battery::after {
+      content: "";
+      display: block;
+      width: 72%;
+      height: 100%;
+      border-radius: 2px;
+      background: var(--fg);
+    }
+    .appbar {
+      height: 56px;
+      display: grid;
+      grid-template-columns: 1fr 40px;
+      align-items: center;
+      gap: 10px;
+      padding: 0 16px 8px;
+    }
+    .brand {
+      min-width: 0;
+      display: grid;
+      grid-template-columns: 30px 1fr;
+      align-items: center;
+      gap: 9px;
+    }
+    .brand-mark {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--accent);
+      color: white;
+      font-weight: 900;
+      font-size: 14px;
+    }
+    .brand-copy {
+      min-width: 0;
+      display: grid;
+      gap: 3px;
+      line-height: 1.05;
+    }
+    .brand-copy strong {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 860;
+    }
+    .brand-copy span {
+      color: var(--muted);
+      font-size: 11px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .alert-button {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 15px;
+      background: var(--surface);
+      color: var(--fg);
+      position: relative;
+      box-shadow: 0 1px 0 var(--border);
+    }
+    .bell {
+      width: 18px;
+      height: 18px;
+      position: relative;
+    }
+    .bell::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 2px;
+      width: 10px;
+      height: 11px;
+      border: 2px solid currentColor;
+      border-bottom: 0;
+      border-radius: 10px 10px 4px 4px;
+    }
+    .bell::after {
+      content: "";
+      position: absolute;
+      left: 7px;
+      bottom: 1px;
+      width: 4px;
+      height: 4px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+    .notify-dot {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 9px;
+      height: 9px;
+      border-radius: 999px;
+      background: var(--danger);
+      border: 2px solid var(--surface);
+    }
+    .app-content {
+      height: calc(100% - 48px - 56px);
+      overflow-y: auto;
+      padding: 0 14px 88px;
+      scrollbar-width: none;
+    }
+    .app-content::-webkit-scrollbar { display: none; }
+    .screen {
+      display: none;
+      gap: 10px;
+    }
+    .screen.active {
+      display: grid;
+    }
+    .screen-head {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 2px;
+    }
+    .eyebrow {
+      margin: 0 0 4px;
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 850;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    h1 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 26px;
+      line-height: 1.06;
+      letter-spacing: 0;
+    }
+    h2 {
+      margin: 0;
+      font-family: var(--font-display);
+      font-size: 16px;
+      line-height: 1.15;
+    }
+    .sync-pill {
+      min-height: 30px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 760;
+      white-space: nowrap;
+    }
+    .sync-pill::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: var(--success);
+    }
+    .metric-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 8px;
+    }
+    .card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+    }
+    .metric-card {
+      min-height: 104px;
+      padding: 13px;
+      display: grid;
+      align-content: space-between;
+    }
+    .metric-card.danger {
+      background: linear-gradient(180deg, var(--danger-soft), var(--surface));
+      border-color: color-mix(in oklch, var(--danger) 22%, var(--border));
+    }
+    .metric {
+      display: flex;
+      align-items: baseline;
+      gap: 5px;
+      color: var(--accent);
+      font-family: var(--font-display);
+      font-size: 30px;
+      font-weight: 860;
+      line-height: 1;
+    }
+    .metric-card.danger .metric { color: var(--danger); }
+    .metric small {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 800;
+    }
+    .label {
+      margin: 0 0 4px;
+      color: var(--fg);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .note {
+      margin: 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.3;
+    }
+    .stat-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .stat-card {
+      min-height: 66px;
+      padding: 10px;
+      display: grid;
+      align-content: space-between;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .stat-card strong {
+      font-size: 18px;
+      line-height: 1;
+    }
+    .stat-card span {
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.2;
+    }
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-top: 2px;
+    }
+    .text-link {
+      min-height: 32px;
+      background: transparent;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 820;
+    }
+    .quick-apps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+    .quick-app {
+      min-height: 70px;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 7px;
+      padding: 9px 6px;
+      border-radius: 18px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      text-align: center;
+      font-size: 10.5px;
+      font-weight: 760;
+      line-height: 1.15;
+    }
+    .app-dot {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .alert-card {
+      min-height: 56px;
+      padding: 10px;
+      display: grid;
+      grid-template-columns: 30px 1fr auto;
+      gap: 9px;
+      align-items: center;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid color-mix(in oklch, var(--danger) 20%, var(--border));
+    }
+    .alert-icon {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--danger-soft);
+      color: var(--danger);
+      font-weight: 900;
+    }
+    .count {
+      min-width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--danger);
+      color: white;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .task-list {
+      display: grid;
+      gap: 8px;
+    }
+    .task-card {
+      padding: 11px;
+      display: grid;
+      gap: 9px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .task-top {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: start;
+    }
+    .task-title {
+      margin: 0;
+      font-size: 14px;
+      font-weight: 850;
+      line-height: 1.22;
+    }
+    .task-subtitle {
+      margin: 3px 0 0;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+    .pill {
+      min-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 820;
+      white-space: nowrap;
+    }
+    .pill.danger {
+      background: var(--danger-soft);
+      color: var(--danger);
+    }
+    .pill.success {
+      background: var(--success-soft);
+      color: oklch(48% 0.15 150);
+    }
+    .tag-row {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .tag {
+      min-height: 24px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 7px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 720;
+    }
+    .tag.blue {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .progress {
+      height: 6px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: var(--soft);
+    }
+    .progress span {
+      display: block;
+      width: var(--value);
+      height: 100%;
+      border-radius: inherit;
+      background: var(--danger);
+    }
+    .task-card.complete .progress span { background: var(--success); }
+    .task-footer {
+      display: grid;
+      grid-template-columns: 30px 1fr auto;
+      gap: 8px;
+      align-items: center;
+    }
+    .avatar {
+      width: 30px;
+      height: 30px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .owner {
+      min-width: 0;
+      display: grid;
+      gap: 1px;
+    }
+    .owner strong,
+    .owner span {
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+    .owner strong { font-size: 12px; }
+    .owner span { color: var(--muted); font-size: 10.5px; }
+    .due {
+      color: var(--danger);
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+    .complete .due { color: var(--success); }
+    .search-panel {
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .search-box {
+      width: 100%;
+      min-height: 40px;
+      border: 0;
+      border-radius: var(--radius-md);
+      padding: 0 12px;
+      background: var(--soft);
+      color: var(--fg);
+      outline: none;
+    }
+    .search-box:focus {
+      box-shadow: 0 0 0 4px var(--accent-soft);
+      background: var(--surface);
+    }
+    .chips {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .chips::-webkit-scrollbar { display: none; }
+    .chip {
+      min-height: 32px;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 820;
+      white-space: nowrap;
+    }
+    .chip.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .app-card {
+      min-height: 94px;
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      color: inherit;
+      text-align: left;
+      border: 1px solid var(--border);
+    }
+    .app-card:active,
+    .quick-app:active,
+    .tab-item:active {
+      transform: scale(0.985);
+    }
+    .app-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+    }
+    .app-badge {
+      min-width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--danger);
+      color: white;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .app-card strong {
+      display: block;
+      color: var(--fg);
+      font-size: 13px;
+      line-height: 1.2;
+    }
+    .app-card span span {
+      display: block;
+      margin-top: 4px;
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.25;
+    }
+    .account-card {
+      padding: 12px;
+      display: grid;
+      gap: 11px;
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .account-card.featured {
+      background:
+        linear-gradient(145deg, oklch(100% 0 0), oklch(96.5% 0.018 260)),
+        var(--surface);
+      border-color: color-mix(in oklch, var(--accent) 18%, var(--border));
+    }
+    .profile-row {
+      display: grid;
+      grid-template-columns: 42px 1fr auto;
+      gap: 10px;
+      align-items: center;
+    }
+    .profile-avatar {
+      width: 42px;
+      height: 42px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--accent);
+      color: white;
+      font-weight: 900;
+    }
+    .role-badge {
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .profile-meta {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .meta-tile {
+      min-height: 52px;
+      padding: 9px;
+      border-radius: var(--radius-md);
+      background: color-mix(in oklch, var(--surface) 70%, var(--accent-soft));
+    }
+    .meta-tile strong {
+      display: block;
+      font-size: 12px;
+      margin-bottom: 3px;
+    }
+    .meta-tile span {
+      display: block;
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.25;
+    }
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .quick-action {
+      min-height: 62px;
+      display: grid;
+      place-items: center;
+      align-content: center;
+      gap: 6px;
+      padding: 8px 6px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      color: var(--fg);
+      text-align: center;
+      font-size: 10.5px;
+      font-weight: 780;
+      line-height: 1.15;
+    }
+    .action-icon {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 11px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .permission-card {
+      padding: 11px;
+      display: grid;
+      gap: 9px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .permission-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .permission-tile {
+      min-height: 58px;
+      display: grid;
+      align-content: center;
+      gap: 4px;
+      padding: 8px;
+      border-radius: var(--radius-md);
+      background: var(--soft);
+    }
+    .permission-tile strong {
+      color: var(--accent);
+      font-size: 15px;
+      line-height: 1;
+    }
+    .permission-tile span {
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.2;
+    }
+    .session-card {
+      padding: 11px;
+      display: grid;
+      gap: 9px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .session-row {
+      display: grid;
+      grid-template-columns: 32px 1fr auto;
+      gap: 9px;
+      align-items: center;
+    }
+    .session-icon {
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--success-soft);
+      color: oklch(48% 0.15 150);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .setting-list {
+      display: grid;
+      gap: 8px;
+    }
+    .setting-row {
+      min-height: 54px;
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 8px;
+      align-items: center;
+      padding: 10px 11px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+    .setting-row .note { font-size: 10.5px; }
+    .setting-state {
+      min-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 8px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .setting-state.ok {
+      background: var(--success-soft);
+      color: oklch(48% 0.15 150);
+    }
+    .setting-state.warn {
+      background: var(--warning-soft);
+      color: oklch(52% 0.14 75);
+    }
+    .arrow {
+      color: var(--muted);
+      font-weight: 900;
+    }
+    .back-button {
+      min-height: 32px;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 0;
+      background: transparent;
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .detail-card {
+      padding: 12px;
+      display: grid;
+      gap: 10px;
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .detail-row {
+      min-height: 48px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 9px 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .detail-row:last-child {
+      border-bottom: 0;
+      padding-bottom: 0;
+    }
+    .detail-value {
+      color: var(--fg);
+      font-size: 12px;
+      font-weight: 800;
+      text-align: right;
+      max-width: 150px;
+    }
+    .switch {
+      width: 42px;
+      height: 24px;
+      padding: 2px;
+      border-radius: 999px;
+      background: var(--soft);
+      position: relative;
+    }
+    .switch::before {
+      content: "";
+      position: absolute;
+      top: 3px;
+      left: 3px;
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      background: var(--surface);
+      box-shadow: 0 1px 3px oklch(0% 0 0 / 0.16);
+    }
+    .switch.on {
+      background: var(--accent);
+    }
+    .switch.on::before {
+      left: 21px;
+    }
+    .detail-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+    }
+    .detail-action {
+      min-height: 42px;
+      border-radius: var(--radius-md);
+      background: var(--accent);
+      color: white;
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .detail-action.secondary {
+      background: var(--soft);
+      color: var(--fg);
+    }
+    .module-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+    .module-stat {
+      min-height: 62px;
+      padding: 10px;
+      display: grid;
+      align-content: center;
+      gap: 3px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .module-stat strong {
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 18px;
+      line-height: 1;
+    }
+    .module-stat span {
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 760;
+      line-height: 1.25;
+    }
+    .module-stat.danger {
+      background: var(--danger-soft);
+      border-color: color-mix(in oklch, var(--danger) 22%, var(--border));
+    }
+    .module-stat.danger strong { color: var(--danger); }
+    .module-stat.success {
+      background: var(--success-soft);
+      border-color: color-mix(in oklch, var(--success) 22%, var(--border));
+    }
+    .module-stat.success strong { color: oklch(48% 0.15 150); }
+    .mini-map {
+      min-height: 214px;
+      position: relative;
+      overflow: hidden;
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border);
+      background:
+        linear-gradient(90deg, color-mix(in oklch, var(--success-soft) 86%, var(--surface)) 1px, transparent 1px),
+        linear-gradient(color-mix(in oklch, var(--success-soft) 86%, var(--surface)) 1px, transparent 1px),
+        color-mix(in oklch, var(--success-soft) 54%, var(--surface));
+      background-size: 38px 38px;
+    }
+    .map-boundary {
+      position: absolute;
+      inset: 32px 28px 48px 38px;
+      border: 2px solid color-mix(in oklch, var(--accent) 60%, transparent);
+      border-radius: 48% 38% 42% 34%;
+      background: color-mix(in oklch, var(--accent-soft) 50%, transparent);
+      transform: rotate(-7deg);
+    }
+    .map-road {
+      position: absolute;
+      height: 5px;
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--warning) 42%, white);
+      box-shadow: 0 0 0 1px color-mix(in oklch, var(--warning) 24%, transparent);
+    }
+    .map-road.r1 { width: 230px; left: 40px; top: 94px; transform: rotate(-18deg); }
+    .map-road.r2 { width: 180px; left: 104px; top: 148px; transform: rotate(17deg); }
+    .map-pin {
+      position: absolute;
+      width: 24px;
+      height: 24px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: var(--surface);
+      color: var(--accent);
+      box-shadow: 0 8px 22px oklch(0% 0 0 / 0.16);
+      font-size: 10px;
+      font-weight: 900;
+    }
+    .map-pin::after {
+      content: "";
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+    .map-pin.hot {
+      color: var(--danger);
+    }
+    .map-pin.p1 { left: 68px; top: 72px; }
+    .map-pin.p2 { right: 76px; top: 92px; }
+    .map-pin.p3 { left: 160px; bottom: 62px; }
+    .map-pin.p4 { right: 46px; bottom: 84px; }
+    .map-tools {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+    }
+    .map-tool {
+      min-height: 30px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 10px;
+      border-radius: 999px;
+      background: color-mix(in oklch, var(--surface) 88%, transparent);
+      color: var(--fg);
+      font-size: 10.5px;
+      font-weight: 850;
+      backdrop-filter: blur(14px);
+      border: 1px solid color-mix(in oklch, var(--border) 70%, transparent);
+    }
+    .layer-list,
+    .program-list,
+    .notice-list {
+      display: grid;
+      gap: 8px;
+    }
+    .compact-row {
+      min-height: 58px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 10px;
+      padding: 10px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .compact-row strong {
+      display: block;
+      color: var(--fg);
+      font-size: 13px;
+      line-height: 1.2;
+    }
+    .compact-row small {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 10.5px;
+      line-height: 1.25;
+    }
+    .layer-dot {
+      width: 26px;
+      height: 26px;
+      display: grid;
+      place-items: center;
+      border-radius: 10px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 11px;
+      font-weight: 900;
+    }
+    .chart-card {
+      padding: 12px;
+      display: grid;
+      gap: 12px;
+      border-radius: var(--radius-xl);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .bar-chart {
+      height: 118px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      align-items: end;
+      gap: 10px;
+      padding-top: 8px;
+    }
+    .bar {
+      display: grid;
+      gap: 6px;
+      align-items: end;
+      justify-items: center;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 800;
+    }
+    .bar span {
+      width: 100%;
+      min-height: 18px;
+      border-radius: 999px 999px 8px 8px;
+      background: linear-gradient(180deg, var(--accent), color-mix(in oklch, var(--accent) 42%, var(--surface)));
+    }
+    .program-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .notice-item {
+      min-height: 72px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: start;
+      gap: 10px;
+      padding: 11px;
+      border-radius: var(--radius-lg);
+      background: var(--surface);
+      border: 1px solid var(--border);
+    }
+    .notice-item.urgent {
+      background: var(--danger-soft);
+      border-color: color-mix(in oklch, var(--danger) 22%, var(--border));
+    }
+    .notice-title {
+      color: var(--fg);
+      font-size: 13px;
+      font-weight: 880;
+      line-height: 1.25;
+    }
+    .notice-meta {
+      margin-top: 5px;
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 720;
+      line-height: 1.35;
+    }
+    .notice-count {
+      min-width: 44px;
+      text-align: right;
+      color: var(--fg);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 900;
+    }
+    .card,
+    .metric-card,
+    .stat-card,
+    .quick-app,
+    .alert-card,
+    .task-card,
+    .search-panel,
+    .app-card,
+    .account-card,
+    .quick-action,
+    .permission-card,
+    .session-card,
+    .setting-row,
+    .detail-card,
+    .module-stat,
+    .compact-row,
+    .chart-card,
+    .notice-item {
+      border: 1px solid var(--card-border);
+      background: var(--card-surface);
+      box-shadow: var(--card-shadow);
+    }
+    .metric-card,
+    .account-card,
+    .detail-card,
+    .chart-card,
+    .mini-map {
+      border-radius: 22px;
+    }
+    .stat-card,
+    .quick-app,
+    .alert-card,
+    .task-card,
+    .search-panel,
+    .app-card,
+    .quick-action,
+    .permission-card,
+    .session-card,
+    .setting-row,
+    .module-stat,
+    .compact-row,
+    .notice-item {
+      border-radius: 18px;
+    }
+    .metric-card,
+    .task-card,
+    .app-card,
+    .account-card,
+    .detail-card,
+    .chart-card,
+    .compact-row,
+    .notice-item {
+      position: relative;
+    }
+    .metric-card::before,
+    .task-card::before,
+    .app-card::before,
+    .account-card::before,
+    .detail-card::before,
+    .chart-card::before,
+    .compact-row::before,
+    .notice-item::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      pointer-events: none;
+      box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.72);
+    }
+    .metric-card { min-height: 96px; padding: 12px; }
+    .stat-card,
+    .module-stat { min-height: 58px; padding: 9px; }
+    .quick-app,
+    .quick-action { min-height: 62px; }
+    .app-card { min-height: 88px; padding: 10px; }
+    .task-card,
+    .compact-row,
+    .notice-item { padding: 10px; }
+    .search-panel { padding: 9px; }
+    .metric-card.danger,
+    .module-stat.danger,
+    .notice-item.urgent {
+      background: linear-gradient(180deg, var(--danger-soft), var(--card-surface));
+      border-color: color-mix(in oklch, var(--danger) 22%, var(--card-border));
+    }
+    .module-stat.success,
+    .pill.success,
+    .setting-state.ok {
+      border-color: color-mix(in oklch, var(--success) 20%, var(--card-border));
+    }
+    .app-dot,
+    .action-icon,
+    .layer-dot {
+      border-radius: 11px;
+      box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.65);
+    }
+    .section-head {
+      padding: 0 2px;
+    }
+    .app-content {
+      padding-inline: 12px;
+      background:
+        radial-gradient(circle at 18% 0%, color-mix(in oklch, var(--accent-soft) 46%, transparent), transparent 34%),
+        var(--bg);
+    }
+    .appbar {
+      padding-inline: 14px;
+    }
+    .alert-button,
+    .sync-pill,
+    .tab-bar {
+      border: 1px solid color-mix(in oklch, var(--card-border) 72%, transparent);
+      box-shadow: 0 8px 24px oklch(20% 0.02 250 / 0.045);
+    }
+    .tab-bar {
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      height: 68px;
+      padding: 6px 8px 8px;
+      border-radius: 24px;
+      background: color-mix(in oklch, var(--surface) 92%, transparent);
+    }
+    .tab-item {
+      min-height: 52px;
+      border-radius: 18px;
+    }
+    .account-card.featured {
+      background: var(--card-surface);
+      border-color: color-mix(in oklch, var(--accent) 18%, var(--card-border));
+    }
+    .meta-tile,
+    .permission-tile {
+      background: color-mix(in oklch, var(--soft) 72%, var(--surface));
+      border: 1px solid color-mix(in oklch, var(--card-border) 72%, transparent);
+    }
+    .search-box {
+      background: color-mix(in oklch, var(--soft) 82%, var(--surface));
+    }
+    .chip,
+    .tag,
+    .setting-state {
+      background: color-mix(in oklch, var(--soft) 80%, var(--surface));
+    }
+    .empty-state {
+      display: none;
+      min-height: 130px;
+      place-items: center;
+      padding: 20px;
+      border-radius: var(--radius-xl);
+      border: 1px dashed var(--border);
+      background: var(--surface);
+      color: var(--muted);
+      text-align: center;
+    }
+    .empty-state.visible { display: grid; }
+    .tab-bar {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 82px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 2px;
+      padding: 7px 12px 20px;
+      background: color-mix(in oklch, var(--surface) 94%, transparent);
+      border-top: 1px solid var(--border);
+      backdrop-filter: blur(20px);
+    }
+    .tab-item {
+      display: grid;
+      place-items: center;
+      gap: 3px;
+      min-height: 54px;
+      border-radius: 17px;
+      background: transparent;
+      color: var(--muted);
+      font-size: 10.5px;
+      font-weight: 820;
+    }
+    .tab-item.active {
+      color: var(--accent);
+      background: var(--accent-soft);
+    }
+    .nav-ico {
+      width: 18px;
+      height: 18px;
+      position: relative;
+      color: currentColor;
+    }
+    .nav-ico.overview::before {
+      content: "";
+      position: absolute;
+      width: 6px;
+      height: 6px;
+      left: 2px;
+      top: 2px;
+      border-radius: 2px;
+      background: currentColor;
+      box-shadow: 9px 0 currentColor, 0 9px currentColor, 9px 9px currentColor;
+    }
+    .nav-ico.apps::before {
+      content: "";
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      left: 2px;
+      top: 2px;
+      border-radius: 1.5px;
+      background: currentColor;
+      box-shadow: 6px 0 currentColor, 12px 0 currentColor, 0 6px currentColor, 6px 6px currentColor, 12px 6px currentColor, 0 12px currentColor, 6px 12px currentColor, 12px 12px currentColor;
+    }
+    .nav-ico.tasks::before {
+      content: "";
+      position: absolute;
+      left: 4px;
+      top: 2px;
+      width: 8px;
+      height: 13px;
+      border-right: 3px solid currentColor;
+      border-bottom: 3px solid currentColor;
+      transform: rotate(38deg);
+      border-radius: 1px;
+    }
+    .nav-ico.account::before {
+      content: "";
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+    .nav-ico.account::after {
+      content: "";
+      position: absolute;
+      left: 2px;
+      bottom: 1px;
+      width: 14px;
+      height: 8px;
+      border-radius: 10px 10px 4px 4px;
+      background: currentColor;
+    }
+    .home-indicator {
+      position: absolute;
+      left: 50%;
+      bottom: 8px;
+      width: 134px;
+      height: 5px;
+      transform: translateX(-50%);
+      border-radius: 999px;
+      background: oklch(20% 0 0 / 0.85);
+      z-index: 45;
+    }
+    .tab-bar {
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      height: 68px;
+      padding: 6px 8px 8px;
+      border-radius: 24px;
+      border: 1px solid color-mix(in oklch, var(--card-border) 72%, transparent);
+      background: color-mix(in oklch, var(--surface) 92%, transparent);
+      box-shadow: 0 8px 24px oklch(20% 0.02 250 / 0.045);
+    }
+    .tab-item {
+      min-height: 52px;
+      border-radius: 18px;
+    }
+    .tab-item.active {
+      background: color-mix(in oklch, var(--accent-soft) 82%, var(--surface));
+      box-shadow: inset 0 1px 0 oklch(100% 0 0 / 0.78);
+    }
+    .report-list {
+      display: grid;
+      gap: 8px;
+    }
+    .report-card {
+      min-height: 84px;
+      display: grid;
+      gap: 8px;
+      padding: 10px;
+      border-radius: 18px;
+      border: 1px solid var(--card-border);
+      background: var(--card-surface);
+      box-shadow: var(--card-shadow);
+    }
+    .report-top,
+    .report-meta {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      align-items: start;
+    }
+    .report-id {
+      color: var(--muted);
+      font-family: var(--font-mono);
+      font-size: 10.5px;
+      font-weight: 850;
+    }
+    .severity {
+      min-height: 24px;
+      display: inline-flex;
+      align-items: center;
+      padding: 0 7px;
+      border-radius: 999px;
+      background: var(--success-soft);
+      color: oklch(48% 0.15 150);
+      font-size: 10.5px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .severity.high {
+      background: var(--warning-soft);
+      color: oklch(52% 0.14 75);
+    }
+    .form-card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 22px;
+      border: 1px solid var(--card-border);
+      background: var(--card-surface);
+      box-shadow: var(--card-shadow);
+    }
+    .toggle-row {
+      min-height: 54px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      align-items: center;
+      padding: 10px;
+      border-radius: 18px;
+      background: color-mix(in oklch, var(--soft) 70%, var(--surface));
+      border: 1px solid color-mix(in oklch, var(--card-border) 74%, transparent);
+    }
+    .form-field {
+      display: grid;
+      gap: 6px;
+    }
+    .form-field label {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 820;
+    }
+    .form-field input,
+    .form-field textarea {
+      width: 100%;
+      border: 1px solid color-mix(in oklch, var(--card-border) 86%, transparent);
+      border-radius: 14px;
+      padding: 11px 12px;
+      background: color-mix(in oklch, var(--soft) 78%, var(--surface));
+      color: var(--fg);
+      outline: none;
+      font: inherit;
+      font-size: 13px;
+    }
+    .form-field textarea {
+      min-height: 96px;
+      resize: none;
+      line-height: 1.35;
+    }
+    .form-field input:focus,
+    .form-field textarea:focus {
+      border-color: color-mix(in oklch, var(--accent) 38%, var(--card-border));
+      box-shadow: 0 0 0 4px var(--accent-soft);
+      background: var(--surface);
+    }
+    .upload-zone {
+      min-height: 58px;
+      display: grid;
+      place-items: center;
+      padding: 12px;
+      border-radius: 16px;
+      border: 1px dashed color-mix(in oklch, var(--accent) 34%, var(--card-border));
+      color: var(--muted);
+      background: color-mix(in oklch, var(--accent-soft) 30%, var(--surface));
+      text-align: center;
+      font-size: 11.5px;
+      font-weight: 760;
+      line-height: 1.3;
+    }
+    .form-status {
+      min-height: 18px;
+      color: var(--danger);
+      font-size: 11px;
+      font-weight: 780;
+    }
+    .chip-row {
+      display: flex;
+      gap: 7px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .chip-row::-webkit-scrollbar { display: none; }
+    .ai-status {
+      min-height: 26px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 0 9px;
+      border-radius: 999px;
+      background: var(--success-soft);
+      color: oklch(48% 0.15 150);
+      font-size: 10.5px;
+      font-weight: 850;
+      white-space: nowrap;
+    }
+    .ai-status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+    .ai-card {
+      display: grid;
+      gap: 10px;
+      padding: 12px;
+      border-radius: 22px;
+      border: 1px solid var(--card-border);
+      background: var(--card-surface);
+      box-shadow: var(--card-shadow);
+    }
+    #ai-assistant.active {
+      min-height: calc(100% - 8px);
+      grid-template-rows: auto minmax(430px, 1fr) auto;
+      gap: 8px;
+    }
+    #ai-assistant .screen-head {
+      align-items: center;
+      margin-bottom: 0;
+    }
+    #ai-assistant .eyebrow {
+      display: none;
+    }
+    #ai-assistant h1 {
+      font-size: 24px;
+      line-height: 1.05;
+    }
+    .ai-chat-panel {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      min-height: 430px;
+      padding: 10px;
+      border-radius: 24px;
+      border: 1px solid var(--card-border);
+      background: var(--card-surface);
+      box-shadow: var(--card-shadow);
+    }
+    .ai-thread {
+      display: grid;
+      align-content: start;
+      gap: 7px;
+      min-height: 0;
+      overflow: hidden;
+    }
+    .ai-chip-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+    .ai-chip {
+      min-height: 28px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 5px;
+      padding: 6px 9px;
+      border-radius: 999px;
+      border: 1px solid color-mix(in oklch, var(--card-border) 86%, transparent);
+      background: color-mix(in oklch, var(--soft) 78%, var(--surface));
+      color: var(--fg);
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1.1;
+      white-space: nowrap;
+    }
+    .ai-chip.active {
+      border-color: color-mix(in oklch, var(--accent) 42%, transparent);
+      background: var(--accent-soft);
+      color: var(--accent);
+    }
+    .ai-icon {
+      width: 28px;
+      height: 28px;
+      display: grid;
+      place-items: center;
+      border-radius: 12px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-weight: 900;
+      font-size: 11px;
+    }
+    .ai-message {
+      display: grid;
+      grid-template-columns: 28px 1fr;
+      gap: 8px;
+      align-items: start;
+    }
+    .ai-message.user {
+      grid-template-columns: 1fr 28px;
+      margin-left: 44px;
+    }
+    .ai-message.user .ai-bubble {
+      border-color: color-mix(in oklch, var(--accent) 34%, transparent);
+      background: var(--accent);
+      color: white;
+    }
+    .ai-message.user .ai-icon {
+      background: color-mix(in oklch, var(--fg) 9%, var(--surface));
+      color: var(--fg);
+    }
+    .ai-bubble {
+      padding: 11px;
+      border-radius: 18px;
+      border: 1px solid color-mix(in oklch, var(--card-border) 84%, transparent);
+      background: color-mix(in oklch, var(--soft) 62%, var(--surface));
+      color: var(--fg);
+      font-size: 12px;
+      line-height: 1.42;
+    }
+    .ai-bubble ul {
+      margin: 8px 0 0;
+      padding-left: 17px;
+      color: var(--muted);
+    }
+    .ai-bubble.compact {
+      padding: 9px 10px;
+      font-size: 11.4px;
+    }
+    .ai-bubble small {
+      display: block;
+      margin-top: 5px;
+      color: inherit;
+      opacity: .72;
+      font-size: 10px;
+      font-weight: 750;
+    }
+    .ai-input-panel {
+      display: grid;
+      gap: 6px;
+      padding: 8px;
+      border-radius: 20px;
+      border: 1px solid var(--card-border);
+      background: var(--card-surface);
+      box-shadow: var(--card-shadow);
+    }
+    .ai-input-row {
+      display: grid;
+      grid-template-columns: 1fr 42px;
+      gap: 8px;
+      align-items: end;
+    }
+    .ai-input-row textarea {
+      width: 100%;
+      min-height: 42px;
+      max-height: 72px;
+      resize: none;
+      border: 1px solid color-mix(in oklch, var(--card-border) 86%, transparent);
+      border-radius: 16px;
+      padding: 10px;
+      background: color-mix(in oklch, var(--soft) 78%, var(--surface));
+      color: var(--fg);
+      outline: none;
+      font: inherit;
+      font-size: 12px;
+      line-height: 1.35;
+    }
+    .ai-send {
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      border-radius: 16px;
+      background: var(--accent);
+      color: white;
+      font-weight: 900;
+    }
+    .ai-result {
+      min-height: 14px;
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 760;
+      line-height: 1.25;
+    }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+  <div class="device-frame" data-od-id="device-frame">
+    <div class="phone" data-od-id="mobile-app">
+      <div class="dynamic-island" data-od-id="dynamic-island"></div>
+      <div class="status-bar" data-od-id="status-bar">
+        <span>20:48</span>
+        <div class="status-icons" aria-hidden="true"><span class="signal"></span><span class="battery"></span></div>
+      </div>
+      <header class="appbar" data-od-id="appbar">
+        <div class="brand" data-od-id="brand-lockup">
+          <span class="brand-mark">A</span>
+          <span class="brand-copy"><strong>AdminSmart</strong><span>UBND Phường 5, Quận 8</span></span>
+        </div>
+        <button class="alert-button" type="button" aria-label="Thông báo" data-od-id="notification-button"><span class="bell"></span><span class="notify-dot"></span></button>
+      </header>
+      <main class="app-content" data-od-id="app-content">
+        <section class="screen active" id="overview" data-od-id="overview-screen">
+          <div class="screen-head" data-od-id="overview-heading">
+            <div><p class="eyebrow">Điều hành hôm nay</p><h1 data-od-id="overview-title">Tổng quan</h1></div>
+            <span class="sync-pill" data-od-id="sync-status">Online</span>
+          </div>
+          <section class="metric-grid" aria-label="Chỉ số chính" data-od-id="overview-summary">
+            <article class="card metric-card" data-od-id="summary-kpi"><div class="metric">68<small>%</small></div><div><p class="label">Hoàn thành KPI</p><p class="note">3/6 chương trình đúng tiến độ</p></div></article>
+            <article class="card metric-card danger" data-od-id="summary-overdue"><div class="metric">24<small>việc</small></div><div><p class="label">Quá hạn</p><p class="note">Cần xử lý hoặc phân công lại</p></div></article>
+          </section>
+          <section class="stat-row" aria-label="Chỉ số phụ" data-od-id="quick-stats">
+            <article class="stat-card" data-od-id="quick-meetings"><strong>5</strong><span>Thông báo khẩn</span></article>
+            <article class="stat-card" data-od-id="quick-residents"><strong>13</strong><span>Địa điểm số</span></article>
+            <article class="stat-card" data-od-id="quick-done"><strong>3</strong><span>Hoàn thành</span></article>
+          </section>
+          <div class="section-head" data-od-id="overview-apps-heading"><h2>Ứng dụng nhanh</h2><button class="text-link" type="button" data-jump-view="apps" data-od-id="open-apps-link">Tất cả</button></div>
+          <section class="quick-apps" aria-label="Ứng dụng nhanh" data-od-id="overview-quick-apps">
+            <button class="quick-app" type="button" data-jump-view="digital-map" data-od-id="quick-app-map"><span class="app-dot">M</span>Bản đồ</button>
+            <button class="quick-app" type="button" data-jump-view="kpi-programs" data-od-id="quick-app-kpi"><span class="app-dot">K</span>KPI</button>
+            <button class="quick-app" type="button" data-jump-view="urgent-alerts" data-od-id="quick-app-urgent"><span class="app-dot">!</span>Khẩn</button>
+            <button class="quick-app" type="button" data-jump-view="tasks" data-od-id="quick-app-tasks"><span class="app-dot">G</span>Giao việc</button>
+          </section>
+          <section class="alert-card" data-od-id="priority-alert">
+            <div class="alert-icon">!</div>
+            <div><p class="label">5 thông báo khẩn chưa chốt</p><p class="note">Ưu tiên xác nhận người nhận trước 17:00 hôm nay</p></div>
+            <span class="count">5</span>
+          </section>
+          <div class="section-head" data-od-id="overview-tasks-heading"><h2>Nhiệm vụ ưu tiên</h2><button class="text-link" type="button" data-jump-view="tasks" data-od-id="view-all-tasks">Xem</button></div>
+          <section class="task-list" aria-label="Nhiệm vụ ưu tiên" data-od-id="overview-task-list">
+            <article class="task-card" data-od-id="overview-task-1"><div class="task-top"><div><h3 class="task-title">Giảm chỉ tiêu bước 1</h3><p class="task-subtitle">Administrator · Công an phường/xã</p></div><span class="pill danger">Quá hạn</span></div><div class="progress"><span style="--value: 15%"></span></div></article>
+            <article class="task-card complete" data-od-id="overview-task-2"><div class="task-top"><div><h3 class="task-title">Chỉnh ý tài liệu và số hóa tài liệu cũ</h3><p class="task-subtitle">Trương Tấn Trạng · Đội An ninh mạng</p></div><span class="pill success">Đã ký</span></div><div class="progress"><span style="--value: 100%"></span></div></article>
+          </section>
+        </section>
+        <section class="screen" id="apps" data-od-id="apps-screen">
+          <div class="screen-head" data-od-id="apps-heading"><div><p class="eyebrow">Danh mục</p><h1 data-od-id="apps-title">Ứng dụng</h1></div><span class="sync-pill">19 app</span></div>
+          <section class="search-panel" data-od-id="apps-search-panel">
+            <input class="search-box" id="appSearch" type="search" placeholder="Tìm ứng dụng..." aria-label="Tìm ứng dụng" data-od-id="app-search">
+            <div class="chips" data-od-id="app-category-chips">
+              <button class="chip active" type="button" data-app-category="all" data-od-id="apps-filter-all">Tất cả</button>
+              <button class="chip" type="button" data-app-category="overview" data-od-id="apps-filter-overview">Tổng quan</button>
+              <button class="chip" type="button" data-app-category="work" data-od-id="apps-filter-work">Nghiệp vụ</button>
+              <button class="chip" type="button" data-app-category="area" data-od-id="apps-filter-area">Địa bàn</button>
+              <button class="chip" type="button" data-app-category="admin" data-od-id="apps-filter-admin">Danh mục</button>
+            </div>
+          </section>
+          <section class="app-grid" id="appGrid" aria-label="Danh sách ứng dụng" data-od-id="app-grid">
+            <button class="app-card" type="button" data-category="overview" data-search="dashboard lanh dao tong quan" data-od-id="app-dashboard"><span class="app-top"><span class="app-dot">D</span></span><span><strong>Dashboard Lãnh đạo</strong><span>KPI và cảnh báo điều hành</span></span></button>
+            <button class="app-card" type="button" data-category="overview" data-search="ban do so dia ban" data-jump-view="digital-map" data-od-id="app-map"><span class="app-top"><span class="app-dot">M</span></span><span><strong>Bản đồ số</strong><span>Điểm nóng theo địa bàn</span></span></button>
+            <button class="app-card" type="button" data-category="work" data-search="to giac toi pham khieu nai" data-jump-view="crime-reports" data-od-id="app-crime-report"><span class="app-top"><span class="app-dot">T</span><span class="app-badge">10</span></span><span><strong>Tố giác tội phạm</strong><span>Tiếp nhận và xử lý đơn</span></span></button>
+            <button class="app-card" type="button" data-category="overview" data-search="ai ho tro tro ly" data-jump-view="ai-assistant" data-od-id="app-ai"><span class="app-top"><span class="app-dot">AI</span></span><span><strong>AI Hỗ trợ</strong><span>Tìm kiếm và gợi ý xử lý</span></span></button>
+            <button class="app-card" type="button" data-category="overview" data-search="dan cu ho gia dinh" data-od-id="app-residents"><span class="app-top"><span class="app-dot">C</span></span><span><strong>Dân cư & Hộ gia đình</strong><span>Biến động cư trú</span></span></button>
+            <button class="app-card" type="button" data-category="overview" data-search="bao cao dinh ky" data-od-id="app-reports"><span class="app-top"><span class="app-dot">B</span></span><span><strong>Báo cáo định kỳ</strong><span>Tổng hợp theo kỳ</span></span></button>
+            <button class="app-card" type="button" data-category="work" data-search="hop khong giay to lich hop" data-od-id="app-meetings"><span class="app-top"><span class="app-dot">H</span><span class="app-badge">3</span></span><span><strong>Họp không giấy tờ</strong><span>Lịch, tài liệu, biên bản</span></span></button>
+            <button class="app-card" type="button" data-category="work" data-search="chuong trinh kpi" data-jump-view="kpi-programs" data-od-id="app-kpi"><span class="app-top"><span class="app-dot">K</span></span><span><strong>Chương trình & KPI</strong><span>Mục tiêu và chỉ tiêu</span></span></button>
+            <button class="app-card" type="button" data-category="work" data-search="giao viec ket luan nhiem vu" data-jump-view="tasks" data-od-id="app-tasks"><span class="app-top"><span class="app-dot">G</span><span class="app-badge">7</span></span><span><strong>Giao việc & Kết luận</strong><span>Phân công, tiến độ, ký nhận</span></span></button>
+            <button class="app-card" type="button" data-category="work" data-search="van ban cong van" data-od-id="app-documents"><span class="app-top"><span class="app-dot">V</span><span class="app-badge">4</span></span><span><strong>Văn bản / Công văn</strong><span>Luân chuyển xử lý</span></span></button>
+            <button class="app-card" type="button" data-category="work" data-search="lich cong tac chung" data-od-id="app-calendar"><span class="app-top"><span class="app-dot">L</span></span><span><strong>Lịch công tác chung</strong><span>Điều phối lịch đơn vị</span></span></button>
+            <button class="app-card" type="button" data-category="work" data-search="thong bao khan" data-jump-view="urgent-alerts" data-od-id="app-urgent"><span class="app-top"><span class="app-dot">K</span><span class="app-badge">5</span></span><span><strong>Thông báo khẩn</strong><span>Cảnh báo cần xử lý</span></span></button>
+            <button class="app-card" type="button" data-category="work" data-search="danh sach thong bao" data-od-id="app-notifications"><span class="app-top"><span class="app-dot">N</span></span><span><strong>Danh sách thông báo</strong><span>Theo dõi phát hành</span></span></button>
+            <button class="app-card" type="button" data-category="area" data-search="dia diem so" data-od-id="app-places"><span class="app-top"><span class="app-dot">Đ</span></span><span><strong>Địa điểm số</strong><span>Vị trí và điểm dữ liệu</span></span></button>
+            <button class="app-card" type="button" data-category="area" data-search="co quan so ban nganh" data-od-id="app-agencies"><span class="app-top"><span class="app-dot">S</span></span><span><strong>Cơ quan / Sở ban ngành</strong><span>Danh bạ đơn vị phối hợp</span></span></button>
+            <button class="app-card" type="button" data-category="admin" data-search="quan ly nguoi dung" data-od-id="app-users"><span class="app-top"><span class="app-dot">U</span></span><span><strong>Quản lý người dùng</strong><span>Tài khoản cán bộ</span></span></button>
+            <button class="app-card" type="button" data-category="admin" data-search="phan quyen" data-od-id="app-permissions"><span class="app-top"><span class="app-dot">P</span></span><span><strong>Phân quyền</strong><span>Vai trò truy cập</span></span></button>
+            <button class="app-card" type="button" data-category="admin" data-search="quan ly nhom" data-od-id="app-groups"><span class="app-top"><span class="app-dot">N</span></span><span><strong>Quản lý nhóm</strong><span>Nhóm nghiệp vụ</span></span></button>
+            <button class="app-card" type="button" data-category="admin" data-search="quan ly chuc vu" data-od-id="app-roles"><span class="app-top"><span class="app-dot">C</span></span><span><strong>Quản lý chức vụ</strong><span>Chức danh đơn vị</span></span></button>
+          </section>
+          <section class="empty-state" id="appEmptyState" data-od-id="apps-empty-state"><div><strong>Không tìm thấy ứng dụng</strong><p>Thử đổi nhóm hoặc từ khóa tìm kiếm.</p></div></section>
+        </section>
+        <section class="screen" id="crime-reports" data-od-id="crime-reports-screen">
+          <div class="screen-head" data-od-id="crime-reports-heading"><div><button class="back-button" type="button" data-back-view="apps" data-od-id="back-crime-reports">‹ Ứng dụng</button><p class="eyebrow">Tiếp nhận</p><h1 data-od-id="crime-reports-title">Tố giác tội phạm</h1></div><button class="text-link" type="button" data-jump-view="crime-report-new" data-od-id="new-crime-report">Thêm</button></div>
+          <section class="module-stats" aria-label="Tổng hợp tố giác" data-od-id="crime-report-stats">
+            <article class="module-stat"><strong>10</strong><span>Tổng đơn</span></article>
+            <article class="module-stat success"><strong>09</strong><span>Tiếp nhận</span></article>
+            <article class="module-stat"><strong>00</strong><span>Đang điều tra</span></article>
+          </section>
+          <section class="search-panel" data-od-id="crime-search-panel">
+            <input class="search-box" type="search" placeholder="Tìm mã hồ sơ, tiêu đề, người nộp..." aria-label="Tìm hồ sơ tố giác" data-od-id="crime-search">
+            <div class="chip-row" role="tablist" aria-label="Lọc hồ sơ tố giác" data-od-id="crime-filter"><button class="chip active" type="button">Tất cả</button><button class="chip" type="button">Tiếp nhận</button><button class="chip" type="button">Cao</button></div>
+          </section>
+          <section class="report-list" aria-label="Danh sách hồ sơ tố giác" data-od-id="crime-report-list">
+            <article class="report-card" data-od-id="crime-report-1"><div class="report-top"><span class="report-id">TG-2026-001</span><span class="severity">Thấp</span></div><div><p class="label">FLC in thêm cổ phiếu</p><p class="note">Đội Cảnh sát giao thông · Trịnh Văn Quyết</p></div><div class="report-meta"><span class="pill">Đóng hồ sơ</span><span class="report-id">22/06</span></div></article>
+            <article class="report-card" data-od-id="crime-report-2"><div class="report-top"><span class="report-id">TG-2026-002</span><span class="severity high">Cao</span></div><div><p class="label">Có người tổ chức sử dụng chất ma túy</p><p class="note">Đội Cảnh sát điều tra ma túy · Nguyễn Việt Dũng</p></div><div class="report-meta"><span class="pill success">Tiếp nhận</span><span class="report-id">16/06</span></div></article>
+            <article class="report-card" data-od-id="crime-report-3"><div class="report-top"><span class="report-id">TG-2026-003</span><span class="severity">Thấp</span></div><div><p class="label">Hàng xóm hát karaoke quá ồn ào</p><p class="note">Công an phường/xã · Phạm Vũ Minh Huy</p></div><div class="report-meta"><span class="pill success">Tiếp nhận</span><span class="report-id">16/06</span></div></article>
+            <article class="report-card" data-od-id="crime-report-4"><div class="report-top"><span class="report-id">TG-2026-008</span><span class="severity">Thấp</span></div><div><p class="label">Dung dao dọa chém người</p><p class="note">Công an phường/xã · Đạt</p></div><div class="report-meta"><span class="pill success">Tiếp nhận</span><span class="report-id">19/06</span></div></article>
+          </section>
+        </section>
+        <section class="screen" id="crime-report-new" data-od-id="crime-report-new-screen">
+          <div class="screen-head" data-od-id="crime-new-heading"><div><button class="back-button" type="button" data-back-view="crime-reports" data-od-id="back-crime-new">‹ Tố giác</button><p class="eyebrow">Hồ sơ mới</p><h1 data-od-id="crime-new-title">Thêm tố giác</h1></div><span class="sync-pill">Bảo mật</span></div>
+          <section class="form-card" aria-label="Nộp đơn tố giác" data-od-id="crime-form-card">
+            <div class="toggle-row" data-od-id="anonymous-toggle"><span><p class="label">Nộp đơn ẩn danh</p><p class="note">Thông tin cá nhân sẽ được mã hóa</p></span><span class="switch" aria-label="Tắt"></span></div>
+            <div class="form-field" data-od-id="crime-name-field"><label for="crimeName">Họ và tên *</label><input id="crimeName" type="text" value="Nguyễn Văn A"></div>
+            <div class="form-field" data-od-id="crime-phone-field"><label for="crimePhone">Số điện thoại</label><input id="crimePhone" type="tel" value="0901234567"></div>
+            <div class="form-field" data-od-id="crime-title-field"><label for="crimeTitle">Tiêu đề tố giác *</label><input id="crimeTitle" type="text" placeholder="Mô tả ngắn gọn về hành vi vi phạm..." data-crime-title></div>
+            <div class="form-field" data-od-id="crime-content-field"><label for="crimeContent">Nội dung chi tiết *</label><textarea id="crimeContent" placeholder="Mô tả chi tiết sự việc, thời gian, đối tượng liên quan..." data-crime-content></textarea></div>
+            <div class="form-field" data-od-id="crime-location-field"><label for="crimeLocation">Địa điểm xảy ra</label><input id="crimeLocation" type="text" placeholder="Địa chỉ cụ thể..."></div>
+            <div class="upload-zone" data-od-id="crime-evidence-upload">Bấm hoặc kéo thả tệp hình ảnh, bằng chứng tại đây</div>
+            <p class="form-status" data-od-id="crime-form-status" aria-live="polite"></p>
+          </section>
+          <div class="detail-actions" data-od-id="crime-form-actions"><button class="detail-action secondary" type="button" data-back-view="crime-reports">Hủy</button><button class="detail-action" type="button" data-crime-submit>Phân tích & Nộp đơn</button></div>
+        </section>
+        <section class="screen" id="ai-assistant" data-od-id="ai-assistant-screen">
+          <div class="screen-head" data-od-id="ai-heading"><div><button class="back-button" type="button" data-back-view="apps" data-od-id="back-ai">‹ Ứng dụng</button><p class="eyebrow">Trợ lý thông minh</p><h1 data-od-id="ai-title">AI Hỗ trợ</h1></div><span class="ai-status">Đang hoạt động</span></div>
+          <section class="ai-chat-panel" data-od-id="ai-chat-panel">
+            <div class="row-between" data-od-id="ai-chat-summary">
+              <div><p class="label">Hội thoại đang mở</p><p class="note">AI hỗ trợ điều hành</p></div>
+              <button class="text-link" type="button" data-ai-new-chat data-od-id="ai-new-chat">Cuộc mới</button>
+            </div>
+            <div class="ai-thread" data-od-id="ai-thread">
+              <div class="ai-message" data-od-id="ai-message-welcome">
+                <span class="ai-icon">AI</span>
+                <div class="ai-bubble compact">Tôi đã sẵn sàng hỗ trợ phân tích dữ liệu điều hành, soạn báo cáo và đề xuất hướng xử lý.</div>
+              </div>
+              <div class="ai-message user" data-od-id="ai-message-user-sample">
+                <div class="ai-bubble compact">Tóm tắt các vấn đề cần ưu tiên hôm nay.</div>
+                <span class="ai-icon">B</span>
+              </div>
+              <div class="ai-message" data-od-id="ai-message-ai-sample">
+                <span class="ai-icon">AI</span>
+                <div class="ai-bubble compact">Có 3 nhóm cần xử lý: 08 KPI đang trễ, 12 nhiệm vụ cần nhắc và 03 biên bản họp chưa chốt đầu việc.</div>
+              </div>
+              <div class="ai-message user" data-od-id="ai-message-user-followup">
+                <div class="ai-bubble compact">Gợi ý bước tiếp theo ngắn gọn.</div>
+                <span class="ai-icon">B</span>
+              </div>
+              <div class="ai-message" data-od-id="ai-message-ai-followup">
+                <span class="ai-icon">AI</span>
+                <div class="ai-bubble compact">Nên gửi nhắc việc theo đơn vị phụ trách, ưu tiên nhóm quá hạn trên 3 ngày và yêu cầu phản hồi trước 16:00 hôm nay.<small>Chọn chip bên dưới để tạo nội dung nhanh.</small></div>
+              </div>
+            </div>
+            <section class="ai-chip-row" aria-label="Gợi ý AI" data-od-id="ai-suggestions">
+              <button class="ai-chip active" type="button" data-ai-suggestion="Tóm tắt KPI tháng này và nêu 3 rủi ro cần xử lý" data-ai-label="KPI">KPI</button>
+              <button class="ai-chip" type="button" data-ai-suggestion="Phân tích nhiệm vụ quá hạn, nhóm theo đơn vị phụ trách" data-ai-label="Quá hạn">Quá hạn</button>
+              <button class="ai-chip" type="button" data-ai-suggestion="Tổng hợp thông tin dân số, hộ gia đình và biến động cư trú" data-ai-label="Dân cư">Dân cư</button>
+              <button class="ai-chip" type="button" data-ai-suggestion="Tóm tắt cuộc họp gần nhất thành đầu việc và hạn xử lý" data-ai-label="Họp">Họp</button>
+              <button class="ai-chip" type="button" data-ai-suggestion="Soạn thông báo nhắc việc gửi các đơn vị chưa hoàn thành" data-ai-label="Soạn nhắc">Soạn nhắc</button>
+            </section>
+          </section>
+          <section class="ai-input-panel" data-od-id="ai-input-panel">
+            <div class="ai-input-row">
+              <textarea placeholder="Nhập câu hỏi hoặc yêu cầu..." data-ai-prompt data-od-id="ai-prompt-input"></textarea>
+              <button class="ai-send" type="button" data-ai-send data-od-id="ai-send-button">↗</button>
+            </div>
+            <p class="ai-result" data-od-id="ai-draft-response" aria-live="polite">AI có thể mắc lỗi. Vui lòng kiểm tra thông tin quan trọng.</p>
+          </section>
+        </section>
+        <section class="screen" id="digital-map" data-od-id="digital-map-screen">
+          <div class="screen-head" data-od-id="digital-map-heading"><div><button class="back-button" type="button" data-back-view="apps" data-od-id="back-digital-map">‹ Ứng dụng</button><p class="eyebrow">Địa bàn</p><h1 data-od-id="digital-map-title">Bản đồ số</h1></div><span class="sync-pill">Xã Tuy An Tây</span></div>
+          <section class="search-panel" data-od-id="map-search-panel">
+            <input class="search-box" type="search" placeholder="Tìm thôn, cơ quan, điểm nóng..." aria-label="Tìm trên bản đồ" data-od-id="map-search">
+          </section>
+          <section class="mini-map" aria-label="Bản đồ địa bàn" data-od-id="map-canvas">
+            <div class="map-boundary"></div><div class="map-road r1"></div><div class="map-road r2"></div>
+            <span class="map-pin p1"></span><span class="map-pin p2 hot"></span><span class="map-pin p3"></span><span class="map-pin p4"></span>
+            <div class="map-tools"><span class="map-tool">6 thôn</span><span class="map-tool">13 địa điểm</span><span class="map-tool">5 lớp</span></div>
+          </section>
+          <section class="module-stats" aria-label="Tổng hợp bản đồ" data-od-id="map-stats">
+            <article class="module-stat"><strong>13</strong><span>Địa điểm</span></article>
+            <article class="module-stat success"><strong>06</strong><span>Thôn theo dõi</span></article>
+            <article class="module-stat danger"><strong>02</strong><span>Điểm nóng</span></article>
+          </section>
+          <section class="layer-list" aria-label="Lớp dữ liệu và địa điểm" data-od-id="map-layers">
+            <article class="compact-row" data-od-id="map-layer-people"><span><strong>Cụm dân cư</strong><small>Mật độ hộ dân, điểm cần rà soát</small></span><span class="layer-dot">ON</span></article>
+            <article class="compact-row" data-od-id="map-layer-public"><span><strong>Cơ quan hành chính</strong><small>Đảng ủy, UBND, trung tâm hành chính công</small></span><span class="layer-dot">3</span></article>
+            <article class="compact-row" data-od-id="map-place-1"><span><strong>Đảng ủy và UBND xã</strong><small>Trung tâm điều hành, tiếp nhận thông tin địa bàn</small></span><span class="arrow">›</span></article>
+            <article class="compact-row" data-od-id="map-place-2"><span><strong>Trung tâm Phục vụ Hành chính công</strong><small>Đang hoạt động, có 4 hồ sơ cần theo dõi</small></span><span class="arrow">›</span></article>
+          </section>
+        </section>
+        <section class="screen" id="kpi-programs" data-od-id="kpi-programs-screen">
+          <div class="screen-head" data-od-id="kpi-heading"><div><button class="back-button" type="button" data-back-view="apps" data-od-id="back-kpi">‹ Ứng dụng</button><p class="eyebrow">Điều hành</p><h1 data-od-id="kpi-title">Chương trình & KPI</h1></div><button class="text-link" type="button" data-od-id="kpi-new-action">Thêm</button></div>
+          <section class="module-stats" aria-label="Tổng quan KPI" data-od-id="kpi-stats">
+            <article class="module-stat"><strong>06</strong><span>Tổng chương trình</span></article>
+            <article class="module-stat success"><strong>03</strong><span>Đúng tiến độ</span></article>
+            <article class="module-stat danger"><strong>01</strong><span>Chậm</span></article>
+          </section>
+          <section class="chart-card" data-od-id="kpi-chart-card">
+            <div class="row-between"><div><p class="label">KPI theo tháng</p><p class="note">Tiến độ hoàn thành chương trình trọng tâm</p></div><span class="pill success">68%</span></div>
+            <div class="bar-chart" aria-label="Biểu đồ KPI">
+              <div class="bar"><span style="height: 48%"></span>T4</div>
+              <div class="bar"><span style="height: 64%"></span>T5</div>
+              <div class="bar"><span style="height: 82%"></span>T6</div>
+              <div class="bar"><span style="height: 70%"></span>T7</div>
+            </div>
+          </section>
+          <section class="search-panel" data-od-id="kpi-filter-panel">
+            <input class="search-box" type="search" placeholder="Tìm chương trình, chủ trì..." aria-label="Tìm chương trình KPI" data-od-id="kpi-search">
+          </section>
+          <section class="program-list" aria-label="Danh sách chương trình KPI" data-od-id="kpi-program-list">
+            <article class="compact-row" data-od-id="kpi-program-1"><span><strong>Chuyển đổi số cấp xã</strong><small>UBND xã · Hạn 30/07/2026</small><span class="program-meta"><span class="tag blue">80%</span><span class="tag">Đúng tiến độ</span></span></span><span class="arrow">›</span></article>
+            <article class="compact-row" data-od-id="kpi-program-2"><span><strong>Cải cách thủ tục hành chính</strong><small>Văn phòng HĐND · Hạn 15/08/2026</small><span class="program-meta"><span class="tag blue">55%</span><span class="tag">Cần nhắc</span></span></span><span class="arrow">›</span></article>
+            <article class="compact-row" data-od-id="kpi-program-3"><span><strong>Rà soát an ninh trật tự</strong><small>Công an xã · Quá hạn 2 ngày</small><span class="program-meta"><span class="tag blue">42%</span><span class="pill danger">Chậm</span></span></span><span class="arrow">›</span></article>
+          </section>
+        </section>
+        <section class="screen" id="urgent-alerts" data-od-id="urgent-alerts-screen">
+          <div class="screen-head" data-od-id="urgent-heading"><div><button class="back-button" type="button" data-back-view="apps" data-od-id="back-urgent">‹ Ứng dụng</button><p class="eyebrow">Khẩn cấp</p><h1 data-od-id="urgent-title">Thông báo khẩn</h1></div><button class="text-link" type="button" data-od-id="urgent-create">Tạo khẩn</button></div>
+          <section class="module-stats" aria-label="Tổng hợp thông báo khẩn" data-od-id="urgent-stats">
+            <article class="module-stat"><strong>16</strong><span>Đã gửi</span></article>
+            <article class="module-stat success"><strong>17</strong><span>Đã đọc</span></article>
+            <article class="module-stat danger"><strong>45</strong><span>Chưa đọc</span></article>
+          </section>
+          <section class="search-panel" data-od-id="urgent-search-panel">
+            <input class="search-box" type="search" placeholder="Tìm nội dung, người gửi..." aria-label="Tìm thông báo khẩn" data-od-id="urgent-search">
+            <div class="chip-row" role="tablist" aria-label="Lọc thông báo khẩn" data-od-id="urgent-filter"><button class="chip active" type="button" data-urgent-filter="all">Tất cả</button><button class="chip" type="button" data-urgent-filter="urgent">Khẩn</button><button class="chip" type="button" data-urgent-filter="unread">Chưa đọc</button></div>
+          </section>
+          <section class="notice-list" aria-label="Lịch sử thông báo khẩn" data-od-id="urgent-list">
+            <article class="notice-item urgent" data-notice-state="urgent unread" data-od-id="urgent-item-1"><span><strong class="notice-title">Họp khẩn cấp về phòng chống thiên tai</strong><p class="notice-meta">Ưu tiên cao · Gửi toàn đơn vị · 08:30 hôm nay</p></span><span class="notice-count">5</span></article>
+            <article class="notice-item" data-notice-state="unread" data-od-id="urgent-item-2"><span><strong class="notice-title">Công văn triển khai nhiệm vụ cuối tuần</strong><p class="notice-meta">Đã gửi 16 · Đã đọc 12 · Còn 4 chưa đọc</p></span><span class="notice-count">75%</span></article>
+            <article class="notice-item" data-notice-state="urgent unread" data-od-id="urgent-item-3"><span><strong class="notice-title">Nhắc xử lý hồ sơ quá hạn</strong><p class="notice-meta">Nhắc lại mỗi 2 giờ · Người nhận: bộ phận một cửa</p></span><span class="notice-count">45</span></article>
+            <article class="notice-item" data-notice-state="read" data-od-id="urgent-item-4"><span><strong class="notice-title">Họp định kỳ giao ban tuần</strong><p class="notice-meta">Mức thường · 32 người nhận · 29 đã xác nhận</p></span><span class="notice-count">91%</span></article>
+          </section>
+        </section>
+        <section class="screen" id="tasks" data-od-id="tasks-screen">
+          <div class="screen-head" data-od-id="tasks-heading"><div><p class="eyebrow">Nghiệp vụ</p><h1 data-od-id="tasks-title">Giao việc</h1></div><button class="text-link" type="button" data-od-id="new-task-action">Tạo mới</button></div>
+          <section class="stat-row" aria-label="Tổng hợp giao việc" data-od-id="task-stats">
+            <article class="stat-card" data-od-id="task-total"><strong>29</strong><span>Tổng nhiệm vụ</span></article>
+            <article class="stat-card" data-od-id="task-overdue"><strong>24</strong><span>Quá hạn</span></article>
+            <article class="stat-card" data-od-id="task-signed"><strong>3</strong><span>Đã ký</span></article>
+          </section>
+          <section class="search-panel" data-od-id="task-filter-panel">
+            <input class="search-box" id="taskSearch" type="search" placeholder="Tìm nhiệm vụ..." aria-label="Tìm nhiệm vụ" data-od-id="task-search">
+            <div class="chips" data-od-id="task-status-chips">
+              <button class="chip active" type="button" data-task-status="all" data-od-id="task-filter-all">Tất cả</button>
+              <button class="chip" type="button" data-task-status="overdue" data-od-id="task-filter-overdue">Quá hạn</button>
+              <button class="chip" type="button" data-task-status="doing" data-od-id="task-filter-doing">Đang làm</button>
+              <button class="chip" type="button" data-task-status="complete" data-od-id="task-filter-complete">Hoàn thành</button>
+            </div>
+          </section>
+          <section class="task-list" id="taskList" aria-label="Danh sách giao việc" data-od-id="task-list">
+            <article class="task-card" data-task-status="overdue" data-search="giam chi tieu buoc 1 administrator" data-od-id="task-card-1"><div class="task-top"><div><h3 class="task-title">Giảm chỉ tiêu bước 1</h3><p class="task-subtitle">Administrator · Công an phường/xã</p></div><span class="pill danger">Quá hạn</span></div><div class="tag-row"><span class="tag">GCTB1</span><span class="tag blue">15%</span></div><div class="progress"><span style="--value: 15%"></span></div><div class="task-footer"><div class="avatar">A</div><div class="owner"><strong>Administrator</strong><span>Hạn 22/06/2026</span></div><div class="due">22/06</div></div></article>
+            <article class="task-card" data-task-status="overdue" data-search="kiem tra tien do ho tich pham vu minh man" data-od-id="task-card-2"><div class="task-top"><div><h3 class="task-title">Kiểm tra tiến độ thực hiện hộ tịch</h3><p class="task-subtitle">Phạm Vũ Minh Mẫn · Đội Cảnh sát QLHC</p></div><span class="pill danger">Quá hạn</span></div><div class="tag-row"><span class="tag">Chỉ đạo trực tiếp</span><span class="tag blue">100%</span></div><div class="progress"><span style="--value: 100%"></span></div><div class="task-footer"><div class="avatar">MM</div><div class="owner"><strong>Phạm Vũ Minh Mẫn</strong><span>Hạn 18/05/2026</span></div><div class="due">18/05</div></div></article>
+            <article class="task-card complete" data-task-status="complete" data-search="chinh y tai lieu so hoa truong tan trang" data-od-id="task-card-3"><div class="task-top"><div><h3 class="task-title">Chỉnh ý tài liệu và số hóa tài liệu cũ</h3><p class="task-subtitle">Trương Tấn Trạng · Đội An ninh mạng</p></div><span class="pill success">Đã ký</span></div><div class="tag-row"><span class="tag blue">KPI Task</span><span class="tag">Hoàn thành</span></div><div class="progress"><span style="--value: 100%"></span></div><div class="task-footer"><div class="avatar">TT</div><div class="owner"><strong>Trương Tấn Trạng</strong><span>Hạn 03/12/2026</span></div><div class="due">03/12</div></div></article>
+          </section>
+          <section class="empty-state" id="taskEmptyState" data-od-id="tasks-empty-state"><div><strong>Không tìm thấy nhiệm vụ</strong><p>Thử đổi trạng thái hoặc từ khóa.</p></div></section>
+        </section>
+        <section class="screen" id="account" data-od-id="account-screen">
+          <div class="screen-head" data-od-id="account-heading"><div><p class="eyebrow">Cá nhân</p><h1 data-od-id="account-title">Tài khoản</h1></div><button class="text-link" type="button" data-od-id="logout-action">Đăng xuất</button></div>
+          <section class="account-card featured" data-od-id="profile-card">
+            <div class="profile-row"><div class="profile-avatar">AD</div><div><p class="label">Administrator</p><p class="note">Chủ tịch UBND · Phường 5, Quận 8</p></div><span class="role-badge">Đang trực</span></div>
+            <div class="profile-meta" data-od-id="profile-meta">
+              <div class="meta-tile"><strong>Đơn vị</strong><span>Công an phường/xã</span></div>
+              <div class="meta-tile"><strong>Vai trò</strong><span>Quản trị hệ thống</span></div>
+            </div>
+            <div class="stat-row" data-od-id="account-workload"><article class="stat-card"><strong>7</strong><span>Việc chờ xử lý</span></article><article class="stat-card"><strong>4</strong><span>Công văn mới</span></article><article class="stat-card"><strong>2</strong><span>Thông báo khẩn</span></article></div>
+          </section>
+          <section class="quick-actions" aria-label="Tác vụ nhanh" data-od-id="account-quick-actions">
+            <button class="quick-action" type="button" data-od-id="quick-update-profile"><span class="action-icon">HS</span>Cập nhật hồ sơ</button>
+            <button class="quick-action" type="button" data-od-id="quick-change-password"><span class="action-icon">MK</span>Đổi mật khẩu</button>
+            <button class="quick-action" type="button" data-od-id="quick-delegate"><span class="action-icon">UQ</span>Ủy quyền xử lý</button>
+          </section>
+          <section class="permission-card" data-od-id="permission-summary">
+            <div class="section-head"><h2>Quyền truy cập</h2><button class="text-link" type="button" data-od-id="permission-detail">Chi tiết</button></div>
+            <div class="permission-grid">
+              <div class="permission-tile"><strong>18</strong><span>Phân hệ được cấp</span></div>
+              <div class="permission-tile"><strong>5</strong><span>Nhóm nghiệp vụ</span></div>
+              <div class="permission-tile"><strong>UBND</strong><span>Phạm vi dữ liệu</span></div>
+            </div>
+          </section>
+          <section class="session-card" data-od-id="active-session-card">
+            <div class="section-head"><h2>Phiên đăng nhập</h2><span class="role-badge">Tin cậy</span></div>
+            <div class="session-row"><span class="session-icon">IP</span><span><p class="label">Thiết bị hiện tại</p><p class="note">Mobile app · Cập nhật 20:48 hôm nay</p></span><span class="arrow">›</span></div>
+          </section>
+          <section class="setting-list" aria-label="Thiết lập tài khoản" data-od-id="account-settings">
+            <button class="setting-row" type="button" data-detail-view="account-profile-detail" data-od-id="account-profile"><span><p class="label">Thông tin cá nhân</p><p class="note">Số điện thoại, email công vụ, chức danh</p></span><span class="setting-state ok">Đủ</span><span class="arrow">›</span></button>
+            <button class="setting-row" type="button" data-detail-view="account-notification-detail" data-od-id="account-notification"><span><p class="label">Thông báo</p><p class="note">Cảnh báo quá hạn, công văn, lịch họp</p></span><span class="setting-state warn">2 mới</span><span class="arrow">›</span></button>
+            <button class="setting-row" type="button" data-detail-view="account-security-detail" data-od-id="account-security"><span><p class="label">Bảo mật</p><p class="note">Mật khẩu, xác thực, phiên đăng nhập</p></span><span class="setting-state ok">2FA</span><span class="arrow">›</span></button>
+            <button class="setting-row" type="button" data-detail-view="account-sync-detail" data-od-id="account-sync"><span><p class="label">Đồng bộ dữ liệu</p><p class="note">Dữ liệu nội bộ đã đồng bộ đầy đủ</p></span><span class="setting-state ok">20:48</span><span class="arrow">›</span></button>
+          </section>
+        </section>
+        <section class="screen" id="account-profile-detail" data-od-id="account-profile-detail-screen">
+          <div class="screen-head" data-od-id="profile-detail-heading"><div><button class="back-button" type="button" data-back-view="account" data-od-id="back-profile">‹ Tài khoản</button><h1 data-od-id="profile-detail-title">Thông tin cá nhân</h1></div><span class="setting-state ok">Đủ</span></div>
+          <section class="detail-card" data-od-id="profile-detail-card">
+            <div class="detail-row"><span><p class="label">Họ tên</p><p class="note">Tên hiển thị trong hệ thống</p></span><span class="detail-value">Administrator</span></div>
+            <div class="detail-row"><span><p class="label">Chức danh</p><p class="note">Vai trò hành chính hiện tại</p></span><span class="detail-value">Chủ tịch UBND</span></div>
+            <div class="detail-row"><span><p class="label">Đơn vị</p><p class="note">Phạm vi công tác</p></span><span class="detail-value">Phường 5, Quận 8</span></div>
+            <div class="detail-row"><span><p class="label">Email công vụ</p><p class="note">Dùng nhận thông báo hệ thống</p></span><span class="detail-value">admin@ubnd.vn</span></div>
+            <div class="detail-row"><span><p class="label">Số điện thoại</p><p class="note">Xác thực và liên hệ khẩn</p></span><span class="detail-value">0900 000 000</span></div>
+          </section>
+          <div class="detail-actions" data-od-id="profile-detail-actions"><button class="detail-action secondary" type="button">Hủy</button><button class="detail-action" type="button">Cập nhật</button></div>
+        </section>
+        <section class="screen" id="account-notification-detail" data-od-id="account-notification-detail-screen">
+          <div class="screen-head" data-od-id="notification-detail-heading"><div><button class="back-button" type="button" data-back-view="account" data-od-id="back-notification">‹ Tài khoản</button><h1 data-od-id="notification-detail-title">Thông báo</h1></div><span class="setting-state warn">2 mới</span></div>
+          <section class="detail-card" data-od-id="notification-detail-card">
+            <div class="detail-row"><span><p class="label">Cảnh báo quá hạn</p><p class="note">Nhiệm vụ sắp hoặc đã quá hạn</p></span><span class="switch on" aria-label="Bật"></span></div>
+            <div class="detail-row"><span><p class="label">Công văn mới</p><p class="note">Văn bản cần xử lý hoặc theo dõi</p></span><span class="switch on" aria-label="Bật"></span></div>
+            <div class="detail-row"><span><p class="label">Lịch họp</p><p class="note">Nhắc trước giờ họp và tài liệu</p></span><span class="switch on" aria-label="Bật"></span></div>
+            <div class="detail-row"><span><p class="label">Thông báo yên lặng</p><p class="note">22:00 đến 06:00 hôm sau</p></span><span class="switch" aria-label="Tắt"></span></div>
+          </section>
+          <section class="setting-list" data-od-id="notification-preview-list"><button class="setting-row" type="button"><span><p class="label">24 nhiệm vụ đã leo thang</p><p class="note">Đã gửi cảnh báo lên cấp trên</p></span><span class="setting-state warn">Mới</span><span class="arrow">›</span></button><button class="setting-row" type="button"><span><p class="label">4 công văn mới</p><p class="note">Chờ phân công xử lý</p></span><span class="setting-state">Hôm nay</span><span class="arrow">›</span></button></section>
+        </section>
+        <section class="screen" id="account-security-detail" data-od-id="account-security-detail-screen">
+          <div class="screen-head" data-od-id="security-detail-heading"><div><button class="back-button" type="button" data-back-view="account" data-od-id="back-security">‹ Tài khoản</button><h1 data-od-id="security-detail-title">Bảo mật</h1></div><span class="setting-state ok">2FA</span></div>
+          <section class="detail-card" data-od-id="security-detail-card">
+            <div class="detail-row"><span><p class="label">Xác thực 2 lớp</p><p class="note">Yêu cầu mã xác thực khi đăng nhập</p></span><span class="switch on" aria-label="Bật"></span></div>
+            <div class="detail-row"><span><p class="label">Đổi mật khẩu</p><p class="note">Lần đổi gần nhất 12/06/2026</p></span><span class="arrow">›</span></div>
+            <div class="detail-row"><span><p class="label">Thiết bị tin cậy</p><p class="note">Mobile app đang sử dụng</p></span><span class="detail-value">1</span></div>
+            <div class="detail-row"><span><p class="label">Tự khóa phiên</p><p class="note">Sau 15 phút không hoạt động</p></span><span class="switch on" aria-label="Bật"></span></div>
+          </section>
+          <div class="detail-actions" data-od-id="security-detail-actions"><button class="detail-action secondary" type="button">Đăng xuất thiết bị khác</button><button class="detail-action" type="button">Lưu</button></div>
+        </section>
+        <section class="screen" id="account-sync-detail" data-od-id="account-sync-detail-screen">
+          <div class="screen-head" data-od-id="sync-detail-heading"><div><button class="back-button" type="button" data-back-view="account" data-od-id="back-sync">‹ Tài khoản</button><h1 data-od-id="sync-detail-title">Đồng bộ dữ liệu</h1></div><span class="setting-state ok">20:48</span></div>
+          <section class="detail-card" data-od-id="sync-detail-card">
+            <div class="detail-row"><span><p class="label">Trạng thái</p><p class="note">Dữ liệu nội bộ đã đồng bộ đầy đủ</p></span><span class="detail-value">Hoàn tất</span></div>
+            <div class="detail-row"><span><p class="label">Nhiệm vụ</p><p class="note">Danh sách giao việc và kết luận</p></span><span class="setting-state ok">29</span></div>
+            <div class="detail-row"><span><p class="label">Văn bản</p><p class="note">Công văn và thông báo liên quan</p></span><span class="setting-state ok">4</span></div>
+            <div class="detail-row"><span><p class="label">Tự đồng bộ</p><p class="note">Khi có kết nối mạng ổn định</p></span><span class="switch on" aria-label="Bật"></span></div>
+          </section>
+          <div class="detail-actions" data-od-id="sync-detail-actions"><button class="detail-action secondary" type="button">Xem lịch sử</button><button class="detail-action" type="button">Đồng bộ ngay</button></div>
+        </section>
+      </main>
+      <nav class="tab-bar" aria-label="Tab bar" data-od-id="tab-bar">
+        <button class="tab-item active" type="button" data-nav-view="overview" data-od-id="nav-overview"><span class="nav-ico overview"></span>Tổng quan</button>
+        <button class="tab-item" type="button" data-nav-view="apps" data-od-id="nav-apps"><span class="nav-ico apps"></span>Ứng dụng</button>
+        <button class="tab-item" type="button" data-nav-view="tasks" data-od-id="nav-tasks"><span class="nav-ico tasks"></span>Giao việc</button>
+        <button class="tab-item" type="button" data-nav-view="account" data-od-id="nav-account"><span class="nav-ico account"></span>Tài khoản</button>
+      </nav>
+      <div class="home-indicator" data-od-id="home-indicator"></div>
+    </div>
+  </div>
+  <script>
+    const screens = [...document.querySelectorAll(".screen")];
+    const navButtons = [...document.querySelectorAll("[data-nav-view]")];
+    const jumpButtons = [...document.querySelectorAll("[data-jump-view]")];
+    const detailButtons = [...document.querySelectorAll("[data-detail-view]")];
+    const backButtons = [...document.querySelectorAll("[data-back-view]")];
+    const appSearch = document.querySelector("#appSearch");
+    const appCards = [...document.querySelectorAll(".app-card")];
+    const appChips = [...document.querySelectorAll("[data-app-category]")];
+    const appEmptyState = document.querySelector("#appEmptyState");
+    const taskSearch = document.querySelector("#taskSearch");
+    const taskCards = [...document.querySelectorAll("#taskList .task-card")];
+    const taskChips = [...document.querySelectorAll("[data-task-status]")];
+    const taskEmptyState = document.querySelector("#taskEmptyState");
+    const moduleFilters = [
+      { input: document.querySelector("[data-od-id='crime-search']"), items: [...document.querySelectorAll("#crime-reports .report-card")] },
+      { input: document.querySelector("[data-od-id='map-search']"), items: [...document.querySelectorAll("#digital-map .compact-row")] },
+      { input: document.querySelector("[data-od-id='kpi-search']"), items: [...document.querySelectorAll("#kpi-programs .compact-row")] }
+    ];
+    const urgentChips = [...document.querySelectorAll("[data-urgent-filter]")];
+    const urgentItems = [...document.querySelectorAll("#urgent-alerts .notice-item")];
+    const crimeSubmit = document.querySelector("[data-crime-submit]");
+    const crimeStatus = document.querySelector("[data-od-id='crime-form-status']");
+    const aiPrompt = document.querySelector("[data-ai-prompt]");
+    const aiSend = document.querySelector("[data-ai-send]");
+    const aiResult = document.querySelector("[data-od-id='ai-draft-response']");
+    const aiSuggestions = [...document.querySelectorAll("[data-ai-suggestion]")];
+    const aiNewChat = document.querySelector("[data-ai-new-chat]");
+    let activeAppCategory = "all";
+    let activeTaskStatus = "all";
+    let activeUrgentFilter = "all";
+    function normalize(value) {
+      return value.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+    }
+    function setView(viewId) {
+      screens.forEach((screen) => screen.classList.toggle("active", screen.id === viewId));
+      navButtons.forEach((button) => {
+        const accountDetail = viewId.startsWith("account-");
+        const appModule = ["crime-reports", "crime-report-new", "ai-assistant", "digital-map", "kpi-programs", "urgent-alerts"].includes(viewId);
+        button.classList.toggle("active", button.dataset.navView === viewId || (accountDetail && button.dataset.navView === "account") || (appModule && button.dataset.navView === "apps"));
+      });
+    }
+    function filterApps() {
+      const query = normalize(appSearch.value.trim());
+      let visibleCount = 0;
+      appCards.forEach((card) => {
+        const categoryMatch = activeAppCategory === "all" || card.dataset.category === activeAppCategory;
+        const queryMatch = !query || card.dataset.search.includes(query);
+        const visible = categoryMatch && queryMatch;
+        card.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+      appEmptyState.classList.toggle("visible", visibleCount === 0);
+    }
+    function filterTasks() {
+      const query = normalize(taskSearch.value.trim());
+      let visibleCount = 0;
+      taskCards.forEach((card) => {
+        const statusMatch = activeTaskStatus === "all" || card.dataset.taskStatus === activeTaskStatus;
+        const queryMatch = !query || card.dataset.search.includes(query);
+        const visible = statusMatch && queryMatch;
+        card.hidden = !visible;
+        if (visible) visibleCount += 1;
+      });
+      taskEmptyState.classList.toggle("visible", visibleCount === 0);
+    }
+    function filterModuleItems(input, items) {
+      const query = normalize(input.value.trim());
+      items.forEach((item) => {
+        item.hidden = query && !normalize(item.textContent).includes(query);
+      });
+    }
+    function filterUrgentItems() {
+      const query = normalize(document.querySelector("[data-od-id='urgent-search']").value.trim());
+      urgentItems.forEach((item) => {
+        const state = item.dataset.noticeState || "";
+        const stateMatch = activeUrgentFilter === "all" || state.includes(activeUrgentFilter);
+        const queryMatch = !query || normalize(item.textContent).includes(query);
+        item.hidden = !(stateMatch && queryMatch);
+      });
+    }
+    navButtons.forEach((button) => button.addEventListener("click", () => setView(button.dataset.navView)));
+    jumpButtons.forEach((button) => button.addEventListener("click", () => setView(button.dataset.jumpView)));
+    detailButtons.forEach((button) => button.addEventListener("click", () => setView(button.dataset.detailView)));
+    backButtons.forEach((button) => button.addEventListener("click", () => setView(button.dataset.backView)));
+    appChips.forEach((chip) => chip.addEventListener("click", () => {
+      appChips.forEach((item) => item.classList.remove("active"));
+      chip.classList.add("active");
+      activeAppCategory = chip.dataset.appCategory;
+      filterApps();
+    }));
+    taskChips.forEach((chip) => chip.addEventListener("click", () => {
+      taskChips.forEach((item) => item.classList.remove("active"));
+      chip.classList.add("active");
+      activeTaskStatus = chip.dataset.taskStatus;
+      filterTasks();
+    }));
+    moduleFilters.forEach(({ input, items }) => input?.addEventListener("input", () => filterModuleItems(input, items)));
+    document.querySelector("[data-od-id='urgent-search']")?.addEventListener("input", filterUrgentItems);
+    urgentChips.forEach((chip) => chip.addEventListener("click", () => {
+      urgentChips.forEach((item) => item.classList.remove("active"));
+      chip.classList.add("active");
+      activeUrgentFilter = chip.dataset.urgentFilter;
+      filterUrgentItems();
+    }));
+    crimeSubmit?.addEventListener("click", () => {
+      const title = document.querySelector("[data-crime-title]")?.value.trim();
+      const content = document.querySelector("[data-crime-content]")?.value.trim();
+      if (!title || !content) {
+        crimeStatus.style.color = "var(--danger)";
+        crimeStatus.textContent = "Cần nhập tiêu đề và nội dung chi tiết trước khi nộp.";
+        return;
+      }
+      crimeStatus.style.color = "oklch(48% 0.15 150)";
+      crimeStatus.textContent = "Đã kiểm tra dữ liệu. Hồ sơ sẵn sàng gửi tiếp nhận.";
+    });
+    aiSuggestions.forEach((button) => button.addEventListener("click", () => {
+      aiSuggestions.forEach((item) => item.classList.remove("active"));
+      button.classList.add("active");
+      aiPrompt.value = button.dataset.aiSuggestion;
+      aiResult.textContent = "Đã chọn chip " + (button.dataset.aiLabel || "gợi ý") + ". Bấm gửi để AI phân tích yêu cầu này.";
+    }));
+    aiSend?.addEventListener("click", () => {
+      const prompt = aiPrompt.value.trim();
+      if (!prompt) {
+        aiResult.textContent = "Nhập câu hỏi hoặc chọn một gợi ý nhanh trước khi gửi.";
+        return;
+      }
+      aiResult.textContent = "AI đang chuẩn bị bản phân tích: " + prompt;
+    });
+    aiNewChat?.addEventListener("click", () => {
+      aiSuggestions.forEach((item) => item.classList.remove("active"));
+      aiPrompt.value = "";
+      aiResult.textContent = "Đã tạo cuộc trò chuyện mới. Chọn chip hoặc nhập yêu cầu để bắt đầu.";
+    });
+    appSearch.addEventListener("input", filterApps);
+    taskSearch.addEventListener("input", filterTasks);
+  </script>
+</body>
+</html>

@@ -5,6 +5,7 @@ import '../utils/auth_helper.dart';
 /// Mọi Service đều kế thừa class này.
 class ApiClient extends GetConnect {
   static const String _baseUrl = 'https://apilanhdao.gvbsoft.vn/api';
+  static const String _skipAuthHeader = 'X-Skip-Authorization';
 
   @override
   void onInit() {
@@ -13,15 +14,16 @@ class ApiClient extends GetConnect {
 
     // Gắn token tự động vào mọi request
     httpClient.addRequestModifier<dynamic>((request) async {
+      final skipAuth = request.headers.remove(_skipAuthHeader) == 'true';
       final token = AuthHelper.getToken();
-      if (token != null) {
+      if (!skipAuth && token != null) {
         // API yêu cầu format: Authorization: uid... (không có "Bearer")
         request.headers['Authorization'] = token;
       }
       request.headers['Content-Type'] = 'application/json';
       request.headers['Accept'] = 'application/json';
       return request;
-    });
+    });   
 
     // Log response lỗi (chỉ debug)
     httpClient.addResponseModifier((request, response) async {

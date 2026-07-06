@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../core/values/app_colors.dart';
-import '../../core/values/app_text_styles.dart';
+import '../core/values/app_colors.dart';
+import '../core/values/app_text_styles.dart';
 
 /// Primary button chuẩn dùng toàn app.
 class AppButton extends StatelessWidget {

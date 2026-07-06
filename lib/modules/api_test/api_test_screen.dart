@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import '../../core/utils/auth_helper.dart';
 import '../../data/repositories/meeting_repository.dart';
 

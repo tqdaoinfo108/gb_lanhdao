@@ -1,3 +1,5 @@
+// ignore_for_file: file_names
+
 const Map<String, String> viVN = {
   'meeting.header.title': 'Lịch họp sắp tới',
   'meeting.header.date': 'Thứ Hai, 29 Tháng 03, 2026',

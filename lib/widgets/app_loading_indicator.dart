@@ -1,16 +1,12 @@
 import 'package:flutter/material.dart';
-import '../../core/values/app_colors.dart';
+import '../core/values/app_colors.dart';
 
 /// Loading indicator dùng chung (full screen hoặc inline).
 class AppLoadingIndicator extends StatelessWidget {
   final bool fullScreen;
   final String? message;
 
-  const AppLoadingIndicator({
-    super.key,
-    this.fullScreen = false,
-    this.message,
-  });
+  const AppLoadingIndicator({super.key, this.fullScreen = false, this.message});
 
   @override
   Widget build(BuildContext context) {
