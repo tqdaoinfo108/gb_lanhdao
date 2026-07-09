@@ -112,6 +112,7 @@ class BookingModel extends BaseModel {
   final String dateStart;
   final String dateEnd;
   final int statusID;
+  final String statusName;
   final String description;
   final String dateCreated;
   final String dateUpdated;
@@ -131,6 +132,7 @@ class BookingModel extends BaseModel {
     required this.dateStart,
     required this.dateEnd,
     required this.statusID,
+    this.statusName = '',
     required this.description,
     required this.dateCreated,
     required this.dateUpdated,
@@ -152,18 +154,23 @@ class BookingModel extends BaseModel {
       dateStart: json['DateStart'] as String? ?? '',
       dateEnd: json['DateEnd'] as String? ?? '',
       statusID: json['StatusID'] as int? ?? 0,
+      statusName: json['StatusName'] as String? ?? '',
       description: json['Description'] as String? ?? '',
       dateCreated: json['DateCreated'] as String? ?? '',
       dateUpdated: json['DateUpdated'] as String? ?? '',
       userCreated: json['UserCreated'] as String? ?? '',
       userUpdated: json['UserUpdated'] as String? ?? '',
-      lstUserJoin: (json['lstUserJoin'] as List<dynamic>?)
+      lstUserJoin:
+          (json['lstUserJoin'] as List<dynamic>?)
               ?.map((e) => UserJoinModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],
-      lstBookingAttachment: (json['lstBookingAttachment'] as List<dynamic>?)
-              ?.map((e) =>
-                  BookingAttachmentModel.fromJson(e as Map<String, dynamic>))
+      lstBookingAttachment:
+          (json['lstBookingAttachment'] as List<dynamic>?)
+              ?.map(
+                (e) =>
+                    BookingAttachmentModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           [],
     );
@@ -182,14 +189,16 @@ class BookingModel extends BaseModel {
       'DateStart': dateStart,
       'DateEnd': dateEnd,
       'StatusID': statusID,
+      'StatusName': statusName,
       'Description': description,
       'DateCreated': dateCreated,
       'DateUpdated': dateUpdated,
       'UserCreated': userCreated,
       'UserUpdated': userUpdated,
       'lstUserJoin': lstUserJoin.map((e) => e.toJson()).toList(),
-      'lstBookingAttachment':
-          lstBookingAttachment.map((e) => e.toJson()).toList(),
+      'lstBookingAttachment': lstBookingAttachment
+          .map((e) => e.toJson())
+          .toList(),
     };
   }
 
@@ -230,15 +239,13 @@ class BookingListResponse {
   final int totals;
   final List<BookingModel> data;
 
-  const BookingListResponse({
-    required this.totals,
-    required this.data,
-  });
+  const BookingListResponse({required this.totals, required this.data});
 
   factory BookingListResponse.fromJson(Map<String, dynamic> json) {
     return BookingListResponse(
       totals: json['totals'] as int? ?? 0,
-      data: (json['data'] as List<dynamic>?)
+      data:
+          (json['data'] as List<dynamic>?)
               ?.map((e) => BookingModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           [],

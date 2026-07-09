@@ -35,5 +35,6 @@ class AppConstants {
   static const String keyToken     = 'access_token';
   static const String keyUserId    = 'user_id';
   static const String keyUserName  = 'user_name';
+  static const String keyUserTypeId = 'user_type_id';
   static const String keyFirstRun  = 'first_run';
 }

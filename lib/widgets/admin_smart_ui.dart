@@ -219,14 +219,12 @@ class SmartPill extends StatelessWidget {
   Widget build(BuildContext context) {
     final colors = _toneColors(tone);
     return Container(
-      constraints: const BoxConstraints(minHeight: 26),
-      padding: const EdgeInsets.symmetric(horizontal: 9),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
       decoration: BoxDecoration(
         color: colors.$1,
         borderRadius: BorderRadius.circular(999),
         border: Border.all(color: colors.$2.withValues(alpha: 0.18)),
       ),
-      alignment: Alignment.center,
       child: Text(
         label,
         maxLines: 1,
