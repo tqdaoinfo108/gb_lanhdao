@@ -162,40 +162,6 @@ class _AppGridTile extends StatelessWidget {
               ],
             ),
           ),
-          if (item.notApplied)
-            Positioned(
-              top: -10,
-              right: -9,
-              child: Transform.rotate(
-                angle: 0.72,
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 2,
-                  ),
-                  decoration: BoxDecoration(
-                    color: SmartColors.danger,
-                    borderRadius: BorderRadius.circular(999),
-                    boxShadow: [
-                      BoxShadow(
-                        color: SmartColors.danger.withValues(alpha: 0.16),
-                        blurRadius: 8,
-                        offset: const Offset(0, 3),
-                      ),
-                    ],
-                  ),
-                  child: Text(
-                    'Chưa áp dụng',
-                    style: AppTextStyles.caption.copyWith(
-                      color: Colors.white,
-                      fontSize: 7.5,
-                      fontWeight: FontWeight.w900,
-                      height: 1,
-                    ),
-                  ),
-                ),
-              ),
-            ),
         ],
       ),
     );

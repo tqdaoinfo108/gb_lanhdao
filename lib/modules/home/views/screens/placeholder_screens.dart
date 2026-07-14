@@ -742,7 +742,9 @@ void _showCrimeDetail(
                             border: Border.all(color: SmartColors.border),
                             boxShadow: [
                               BoxShadow(
-                                color: SmartColors.border.withValues(alpha: 0.4),
+                                color: SmartColors.border.withValues(
+                                  alpha: 0.4,
+                                ),
                                 blurRadius: 16,
                                 offset: const Offset(0, 4),
                               ),
@@ -805,7 +807,9 @@ void _showCrimeDetail(
                             border: Border.all(color: SmartColors.border),
                             boxShadow: [
                               BoxShadow(
-                                color: SmartColors.border.withValues(alpha: 0.2),
+                                color: SmartColors.border.withValues(
+                                  alpha: 0.2,
+                                ),
                                 blurRadius: 10,
                                 offset: const Offset(0, 2),
                               ),
@@ -817,8 +821,9 @@ void _showCrimeDetail(
                                 : 'Không có nội dung chi tiết.',
                             style: AppTextStyles.bodyMedium.copyWith(
                               height: 1.5,
-                              color: AppColors.textPrimary
-                                  .withValues(alpha: 0.9),
+                              color: AppColors.textPrimary.withValues(
+                                alpha: 0.9,
+                              ),
                             ),
                           ),
                         ),
@@ -940,126 +945,129 @@ class _CrimeReportForm extends StatelessWidget {
     return SmartCard(
       radius: 22,
       padding: const EdgeInsets.all(14),
-      child: Obx(() => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              color: SmartColors.soft,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: SmartColors.border),
-            ),
-            child: SwitchListTile.adaptive(
-              contentPadding: const EdgeInsets.symmetric(horizontal: 12),
-              secondary: const Icon(
-                Icons.visibility_off_outlined,
-                color: AppColors.textSecondary,
+      child: Obx(
+        () => Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: SmartColors.soft,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: SmartColors.border),
               ),
-              title: Text(
-                'Nộp đơn ẩn danh',
-                style: AppTextStyles.bodyMedium.copyWith(
-                  fontWeight: FontWeight.w800,
+              child: SwitchListTile.adaptive(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
+                secondary: const Icon(
+                  Icons.visibility_off_outlined,
+                  color: AppColors.textSecondary,
                 ),
+                title: Text(
+                  'Nộp đơn ẩn danh',
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                subtitle: Text(
+                  'Thông tin cá nhân sẽ được mã hóa, chỉ lãnh đạo có thẩm quyền mới xem được',
+                  style: AppTextStyles.caption,
+                ),
+                value: controller.anonymousReport.value,
+                activeThumbColor: SmartColors.danger,
+                onChanged: (value) {
+                  controller.anonymousReport.value = value;
+                  controller.crimeAiAnalysis.value = null;
+                },
               ),
-              subtitle: Text(
-                'Thông tin cá nhân sẽ được mã hóa, chỉ lãnh đạo có thẩm quyền mới xem được',
-                style: AppTextStyles.caption,
-              ),
-              value: controller.anonymousReport.value,
-              activeThumbColor: SmartColors.danger,
-              onChanged: (value) {
-                controller.anonymousReport.value = value;
-                controller.crimeAiAnalysis.value = null;
-              },
             ),
-          ),
-          if (!controller.anonymousReport.value) ...[
-            const SizedBox(height: 12),
-            LayoutBuilder(
-              builder: (context, constraints) {
-                final compact = constraints.maxWidth < 520;
-                final name = _CrimeFormField(
-                  label: 'Họ và tên *',
-                  controller: controller.crimeNameController,
-                  hint: 'Nguyễn Văn A',
-                );
-                final phone = _CrimeFormField(
-                  label: 'Số điện thoại',
-                  controller: controller.crimePhoneController,
-                  hint: '0901234567',
-                  keyboardType: TextInputType.phone,
-                );
-                if (compact) {
-                  return Column(
-                    children: [name, const SizedBox(height: 10), phone],
+            if (!controller.anonymousReport.value) ...[
+              const SizedBox(height: 12),
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  final compact = constraints.maxWidth < 520;
+                  final name = _CrimeFormField(
+                    label: 'Họ và tên *',
+                    controller: controller.crimeNameController,
+                    hint: 'Nguyễn Văn A',
                   );
-                }
-                return Row(
-                  children: [
-                    Expanded(child: name),
-                    const SizedBox(width: 10),
-                    Expanded(child: phone),
-                  ],
-                );
-              },
-            ),
-          ],
-          const SizedBox(height: 12),
-          _CrimeFormField(
-            label: 'Tiêu đề tố giác *',
-            controller: controller.crimeTitleController,
-            hint: 'Mô tả ngắn gọn về hành vi vi phạm...',
-          ),
-          const SizedBox(height: 10),
-          _CrimeFormField(
-            label: 'Nội dung chi tiết *',
-            controller: controller.crimeDescriptionController,
-            hint: 'Mô tả chi tiết sự việc, thời gian, đối tượng liên quan...',
-            maxLines: 5,
-          ),
-          const SizedBox(height: 10),
-          _CrimeFormField(
-            label: 'Địa điểm xảy ra',
-            controller: controller.crimeAddressController,
-            hint: 'Địa chỉ cụ thể...',
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'Bằng chứng đính kèm',
-            style: AppTextStyles.caption.copyWith(
-              color: AppColors.textPrimary,
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 8),
-          _CrimeAttachmentList(controller: controller),
-          const SizedBox(height: 8),
-          _CrimeUploadBox(controller: controller),
-          const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: SmartPrimaryButton(
-                  label: 'Hủy',
-                  secondary: true,
-                  onTap: () => controller.showView(AdminSmartView.crimeReports),
-                ),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: SmartPrimaryButton(
-                  label: controller.isCrimeAiAnalyzing.value
-                      ? 'Đang phân tích...'
-                      : 'Phân tích AI',
-                  onTap: controller.isCrimeAiAnalyzing.value
-                      ? null
-                      : controller.analyzeCrimeReport,
-                ),
+                  final phone = _CrimeFormField(
+                    label: 'Số điện thoại',
+                    controller: controller.crimePhoneController,
+                    hint: '0901234567',
+                    keyboardType: TextInputType.phone,
+                  );
+                  if (compact) {
+                    return Column(
+                      children: [name, const SizedBox(height: 10), phone],
+                    );
+                  }
+                  return Row(
+                    children: [
+                      Expanded(child: name),
+                      const SizedBox(width: 10),
+                      Expanded(child: phone),
+                    ],
+                  );
+                },
               ),
             ],
-          ),
-        ],
-      )),
+            const SizedBox(height: 12),
+            _CrimeFormField(
+              label: 'Tiêu đề tố giác *',
+              controller: controller.crimeTitleController,
+              hint: 'Mô tả ngắn gọn về hành vi vi phạm...',
+            ),
+            const SizedBox(height: 10),
+            _CrimeFormField(
+              label: 'Nội dung chi tiết *',
+              controller: controller.crimeDescriptionController,
+              hint: 'Mô tả chi tiết sự việc, thời gian, đối tượng liên quan...',
+              maxLines: 5,
+            ),
+            const SizedBox(height: 10),
+            _CrimeFormField(
+              label: 'Địa điểm xảy ra',
+              controller: controller.crimeAddressController,
+              hint: 'Địa chỉ cụ thể...',
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Bằng chứng đính kèm',
+              style: AppTextStyles.caption.copyWith(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            const SizedBox(height: 8),
+            _CrimeAttachmentList(controller: controller),
+            const SizedBox(height: 8),
+            _CrimeUploadBox(controller: controller),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: SmartPrimaryButton(
+                    label: 'Hủy',
+                    secondary: true,
+                    onTap: () =>
+                        controller.showView(AdminSmartView.crimeReports),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: SmartPrimaryButton(
+                    label: controller.isCrimeAiAnalyzing.value
+                        ? 'Đang phân tích...'
+                        : 'Phân tích AI',
+                    onTap: controller.isCrimeAiAnalyzing.value
+                        ? null
+                        : controller.analyzeCrimeReport,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
@@ -1135,7 +1143,7 @@ class _CrimeReportConfirm extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        
+
         // Unified Details Container
         Container(
           decoration: BoxDecoration(
@@ -1173,7 +1181,7 @@ class _CrimeReportConfirm extends StatelessWidget {
             ],
           ),
         ),
-        
+
         const SizedBox(height: 24),
         Row(
           children: [
@@ -1476,68 +1484,5 @@ SmartTone _crimeLevelToneForId(int levelId) {
       return SmartTone.danger;
     default:
       return SmartTone.success;
-  }
-}
-
-class _AiAssistantScreen extends StatelessWidget {
-  final HomeController controller;
-
-  const _AiAssistantScreen({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return _ScreenStack(
-      children: [
-        SmartScreenHeader(
-          backLabel: 'Ứng dụng',
-          onBack: () => controller.showView(AdminSmartView.apps),
-          eyebrow: 'Trợ lý thông minh',
-          title: 'AI Hỗ trợ',
-          badge: 'Đang hoạt động',
-        ),
-        SmartCard(
-          radius: 22,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  const Expanded(
-                    child: _LabelNote(
-                      label: 'Hội thoại đang mở',
-                      note: 'AI hỗ trợ điều hành',
-                    ),
-                  ),
-                  SmartTextButton(
-                    label: 'Cuộc mới',
-                    onTap: controller.resetAiChat,
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              const _EmptyState(
-                title: 'Chưa có hội thoại AI',
-                note:
-                    'Dữ liệu mẫu local đã tắt. Nhập yêu cầu để bắt đầu phiên hỗ trợ mới.',
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                controller: controller.aiPromptController,
-                minLines: 1,
-                maxLines: 4,
-                onChanged: (value) => controller.aiPrompt.value = value,
-                decoration: InputDecoration(
-                  hintText: 'Nhập câu hỏi hoặc yêu cầu...',
-                  suffixIcon: IconButton(
-                    onPressed: controller.sendAiPrompt,
-                    icon: const Icon(Icons.send_rounded),
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
   }
 }

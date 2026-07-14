@@ -7,7 +7,6 @@ class _AppItem {
   final String search;
   final String? count;
   final AdminSmartView? view;
-  final bool notApplied;
 
   const _AppItem({
     required this.title,
@@ -16,7 +15,6 @@ class _AppItem {
     required this.search,
     this.count,
     this.view,
-    this.notApplied = false,
   });
 }
 
@@ -64,14 +62,13 @@ const _appGroups = [
         icon: Icons.auto_awesome_rounded,
         search: 'ai ho tro tro ly',
         view: AdminSmartView.aiAssistant,
-        notApplied: true,
       ),
       _AppItem(
         title: 'Dân cư & Hộ gia đình',
         subtitle: 'Biến động cư trú',
         icon: Icons.groups_rounded,
         search: 'dan cu ho gia dinh',
-        notApplied: true,
+        view: AdminSmartView.residence,
       ),
       _AppItem(
         title: 'Báo cáo định kỳ',
@@ -108,7 +105,6 @@ const _appGroups = [
         search: 'giao viec ket luan nhiem vu',
         count: '7',
         view: AdminSmartView.tasks,
-        notApplied: true,
       ),
       _AppItem(
         title: 'Văn bản / Công văn',
@@ -116,7 +112,7 @@ const _appGroups = [
         icon: Icons.description_outlined,
         search: 'van ban cong van',
         count: '4',
-        notApplied: true,
+        view: AdminSmartView.documents,
       ),
       _AppItem(
         title: 'Lịch công tác chung',
@@ -132,13 +128,6 @@ const _appGroups = [
         search: 'thong bao khan',
         view: AdminSmartView.urgentAlerts,
       ),
-      _AppItem(
-        title: 'Danh sách thông báo',
-        subtitle: 'Theo dõi phát hành',
-        icon: Icons.notifications_rounded,
-        search: 'danh sach thong bao',
-        notApplied: true,
-      ),
     ],
   ),
   _AppGroup(
@@ -150,7 +139,7 @@ const _appGroups = [
         subtitle: 'Vị trí và điểm dữ liệu',
         icon: Icons.place_outlined,
         search: 'dia diem so',
-        notApplied: true,
+        view: AdminSmartView.offices,
       ),
       _AppItem(
         title: 'Cơ quan / Sở ban ngành',

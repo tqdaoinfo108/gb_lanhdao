@@ -6,12 +6,15 @@ import 'package:latlong2/latlong.dart';
 import '../../../core/values/app_colors.dart';
 import '../../../core/values/app_text_styles.dart';
 import '../../../data/models/agency_models.dart';
+import '../../../data/models/ai_assistant_models.dart';
 import '../../../data/models/booking_models.dart';
 import '../../../data/models/dashboard_models.dart';
 import '../../../data/models/digital_map_models.dart';
+import '../../../data/models/document_models.dart';
 import '../../../data/models/kpi_models.dart';
 import '../../../data/models/office_models.dart';
 import '../../../data/models/process_models.dart';
+import '../../../data/models/residence_models.dart';
 import '../../../data/models/urgent_alert_models.dart';
 import '../../../data/models/crime_report_models.dart';
 import '../../../data/models/work_calendar_models.dart';
@@ -25,7 +28,11 @@ part 'screens/meeting_schedule_screen.dart';
 part 'screens/work_calendar_screen.dart';
 part 'screens/apps_screen.dart';
 part 'screens/placeholder_screens.dart';
+part 'screens/ai_assistant_screen.dart';
 part 'screens/digital_map_screen.dart';
+part 'screens/offices_screen.dart';
+part 'screens/residence_screen.dart';
+part 'screens/documents_screen.dart';
 part 'screens/kpi_programs_screen.dart';
 part 'screens/agencies_screen.dart';
 part 'screens/tasks_screen.dart';
@@ -68,10 +75,14 @@ class HomeScreen extends GetView<HomeController> {
                   },
                   child: SizedBox.expand(
                     key: ValueKey(controller.currentView.value),
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.fromLTRB(14, 4, 14, 18),
-                      child: _buildCurrentScreen(),
-                    ),
+                    child:
+                        controller.currentView.value ==
+                            AdminSmartView.aiAssistant
+                        ? _buildCurrentScreen()
+                        : SingleChildScrollView(
+                            padding: const EdgeInsets.fromLTRB(14, 4, 14, 18),
+                            child: _buildCurrentScreen(),
+                          ),
                   ),
                 ),
               ),
@@ -102,6 +113,12 @@ class HomeScreen extends GetView<HomeController> {
         return _AiAssistantScreen(controller: controller);
       case AdminSmartView.digitalMap:
         return _DigitalMapScreen(controller: controller);
+      case AdminSmartView.offices:
+        return _OfficesScreen(controller: controller);
+      case AdminSmartView.residence:
+        return _ResidenceScreen(controller: controller);
+      case AdminSmartView.documents:
+        return _DocumentsScreen(controller: controller);
       case AdminSmartView.kpiPrograms:
         return _KpiProgramsScreen(controller: controller);
       case AdminSmartView.urgentAlerts:

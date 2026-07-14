@@ -85,17 +85,16 @@ class _UrgentStatWrap extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 92, // Fixed height to prevent layout issues in unconstrained parents
+      height:
+          92, // Fixed height to prevent layout issues in unconstrained parents
       child: ListView.separated(
         padding: const EdgeInsets.symmetric(horizontal: 16),
         scrollDirection: Axis.horizontal,
         clipBehavior: Clip.none,
         itemCount: stats.length,
         separatorBuilder: (context, index) => const SizedBox(width: 12),
-        itemBuilder: (context, index) => SizedBox(
-          width: 140,
-          child: _UrgentStatCard(stat: stats[index]),
-        ),
+        itemBuilder: (context, index) =>
+            SizedBox(width: 140, child: _UrgentStatCard(stat: stats[index])),
       ),
     );
   }
@@ -162,11 +161,20 @@ class _UrgentSearchFilterBar extends StatelessWidget {
               textInputAction: TextInputAction.search,
               decoration: InputDecoration(
                 hintText: 'Tìm kiếm thông báo...',
-                hintStyle: AppTextStyles.bodyMedium.copyWith(color: AppColors.textSecondary),
-                prefixIcon: const Icon(Icons.search_rounded, size: 22, color: AppColors.textSecondary),
+                hintStyle: AppTextStyles.bodyMedium.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+                prefixIcon: const Icon(
+                  Icons.search_rounded,
+                  size: 22,
+                  color: AppColors.textSecondary,
+                ),
                 filled: true,
                 fillColor: SmartColors.surface,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
                 isDense: true,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(14),
@@ -189,7 +197,10 @@ class _UrgentSearchFilterBar extends StatelessWidget {
             child: OutlinedButton.icon(
               onPressed: () => _showUrgentFilterSheet(context, controller),
               icon: const Icon(Icons.tune_rounded, size: 20),
-              label: const Text('Lọc', style: TextStyle(fontWeight: FontWeight.w600)),
+              label: const Text(
+                'Lọc',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
               style: OutlinedButton.styleFrom(
                 foregroundColor: AppColors.textPrimary,
                 backgroundColor: SmartColors.surface,
@@ -245,18 +256,23 @@ class _UrgentAlertList extends StatelessWidget {
             )
           else
             ...items.asMap().entries.map(
-                  (entry) => Column(
-                    children: [
-                      _UrgentAlertRow(
-                        item: entry.value,
-                        groups: groups,
-                        onDetail: () => onDetail(entry.value),
-                      ),
-                      if (entry.key < items.length - 1)
-                        const Divider(height: 1, color: SmartColors.border, indent: 64, endIndent: 16),
-                    ],
+              (entry) => Column(
+                children: [
+                  _UrgentAlertRow(
+                    item: entry.value,
+                    groups: groups,
+                    onDetail: () => onDetail(entry.value),
                   ),
-                ),
+                  if (entry.key < items.length - 1)
+                    const Divider(
+                      height: 1,
+                      color: SmartColors.border,
+                      indent: 64,
+                      endIndent: 16,
+                    ),
+                ],
+              ),
+            ),
         ],
       ),
     );
@@ -315,8 +331,12 @@ class _UrgentAlertRow extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                           style: AppTextStyles.bodyMedium.copyWith(
-                            fontWeight: item.isRead ? FontWeight.w500 : FontWeight.w800,
-                            color: item.isRead ? AppColors.textSecondary : AppColors.textPrimary,
+                            fontWeight: item.isRead
+                                ? FontWeight.w500
+                                : FontWeight.w800,
+                            color: item.isRead
+                                ? AppColors.textSecondary
+                                : AppColors.textPrimary,
                           ),
                         ),
                       ),
@@ -837,49 +857,436 @@ class _TasksScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
+      final processes = _filteredTaskProcesses(
+        controller.kpiBundle.value.processes,
+        controller.taskQuery.value,
+        controller.taskStatus.value,
+      );
+      final all = controller.kpiBundle.value.processes;
+
       return _ScreenStack(
         children: [
           SmartScreenHeader(
+            backLabel: 'Giao việc',
+            onBack: () => controller.showView(AdminSmartView.tasks),
             eyebrow: 'Nghiệp vụ',
-            title: 'Giao việc',
+            title: 'Giao việc & Kết luận',
+            badge: '${processes.length} việc',
             actionLabel: 'Tạo mới',
             onAction: controller.openProcessCreate,
           ),
           if (controller.processCreateMessage.value != null)
             _InlineSuccess(message: controller.processCreateMessage.value!),
-          const SmartStatGrid(
+          if (controller.isKpiLoading.value) const LinearProgressIndicator(),
+          if (controller.kpiError.value != null)
+            _InlineError(
+              message: controller.kpiError.value!,
+              onRetry: controller.fetchKpiPrograms,
+            ),
+          SmartStatGrid(
             stats: [
-              SmartStatData(value: '0', label: 'Tổng nhiệm vụ'),
+              SmartStatData(value: all.length.toString(), label: 'Tổng việc'),
               SmartStatData(
-                value: '0',
+                value: all
+                    .where((item) => !item.isDone && !item.isLate)
+                    .length
+                    .toString(),
+                label: 'Đang xử lý',
+                tone: SmartTone.accent,
+              ),
+              SmartStatData(
+                value: all.where((item) => item.isLate).length.toString(),
                 label: 'Quá hạn',
                 tone: SmartTone.danger,
               ),
               SmartStatData(
-                value: '0',
-                label: 'Đã ký',
+                value: all.where((item) => item.isDone).length.toString(),
+                label: 'Hoàn thành',
                 tone: SmartTone.success,
               ),
             ],
           ),
           SmartSearchPanel(
             controller: controller.taskSearchController,
-            hint: 'Tìm nhiệm vụ...',
+            hint: 'Tìm tiêu đề, mã việc, trạng thái...',
             onChanged: (value) => controller.taskQuery.value = value,
             chips: const ['all', 'overdue', 'doing', 'complete'],
             activeChip: controller.taskStatus.value,
             chipLabelBuilder: _taskStatusLabel,
             onChipSelected: (value) => controller.taskStatus.value = value,
           ),
-          const _EmptyState(
-            title: 'Chưa có danh sách giao việc',
-            note:
-                'Dữ liệu mẫu local đã tắt. Hiện chỉ còn chức năng tạo giao việc qua API thật.',
+          SmartCard(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(14, 13, 14, 10),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          'Danh sách giao việc',
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      Text(
+                        '${processes.length} / ${all.length}',
+                        style: AppTextStyles.caption.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(height: 1),
+                if (processes.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.all(18),
+                    child: _EmptyState(
+                      title: 'Không có giao việc phù hợp',
+                      note: 'Thử đổi từ khóa hoặc bộ lọc trạng thái.',
+                    ),
+                  )
+                else
+                  ...processes.asMap().entries.map((entry) {
+                    return Column(
+                      children: [
+                        _TaskProcessCard(
+                          item: entry.value,
+                          onTap: () =>
+                              _showTaskProcessDetail(context, entry.value),
+                        ),
+                        if (entry.key < processes.length - 1)
+                          const Divider(height: 1, indent: 70),
+                      ],
+                    );
+                  }),
+              ],
+            ),
           ),
         ],
       );
     });
   }
+}
+
+class _TaskProcessCard extends StatelessWidget {
+  final KpiProcessItem item;
+  final VoidCallback onTap;
+
+  const _TaskProcessCard({required this.item, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SmartIconBadge(
+              label: item.processId > 0 ? '#${item.processId}' : 'GV',
+              tone: item.statusTone,
+              size: 42,
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.title.trim().isEmpty
+                              ? 'Giao việc chưa đặt tiêu đề'
+                              : item.title.trim(),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: AppTextStyles.bodyMedium.copyWith(
+                            fontWeight: FontWeight.w900,
+                            height: 1.25,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      SmartPill(
+                        label: item.displayStatus,
+                        tone: item.statusTone,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 12,
+                    runSpacing: 6,
+                    children: [
+                      _TaskMeta(
+                        icon: Icons.event_available_outlined,
+                        text: _formatDateLabel(item.dateExpired),
+                        color: item.isLate
+                            ? SmartColors.danger
+                            : AppColors.textSecondary,
+                      ),
+                      if (item.kpiId > 0)
+                        _TaskMeta(
+                          icon: Icons.query_stats_rounded,
+                          text: 'KPI #${item.kpiId}',
+                        ),
+                      _TaskMeta(
+                        icon: Icons.flag_outlined,
+                        text: item.displayLevel,
+                        color: item.isUrgent
+                            ? SmartColors.warning
+                            : AppColors.textSecondary,
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    item.kpiId > 0
+                        ? 'Liên kết KPI #${item.kpiId}'
+                        : 'Nguồn giao việc',
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: AppTextStyles.caption,
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 6),
+            const Icon(
+              Icons.chevron_right_rounded,
+              color: AppColors.textSecondary,
+              size: 22,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _TaskMeta extends StatelessWidget {
+  final IconData icon;
+  final String text;
+  final Color? color;
+
+  const _TaskMeta({required this.icon, required this.text, this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    final effectiveColor = color ?? AppColors.textSecondary;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 14, color: effectiveColor),
+        const SizedBox(width: 4),
+        Text(
+          text,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: AppTextStyles.caption.copyWith(
+            fontSize: 11,
+            color: effectiveColor,
+            fontWeight: color == null ? FontWeight.w500 : FontWeight.w800,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+void _showTaskProcessDetail(BuildContext context, KpiProcessItem item) {
+  showModalBottomSheet<void>(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,
+    builder: (context) {
+      return SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 0, 12, 12),
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              color: SmartColors.background,
+              borderRadius: BorderRadius.circular(22),
+              border: Border.all(color: SmartColors.border),
+            ),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(16, 14, 16, 18),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item.title.trim().isEmpty
+                              ? 'Giao việc chưa đặt tiêu đề'
+                              : item.title.trim(),
+                          style: AppTextStyles.h3.copyWith(
+                            fontWeight: FontWeight.w900,
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        tooltip: 'Đóng',
+                        onPressed: () => Navigator.of(context).pop(),
+                        icon: const Icon(Icons.close_rounded),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      SmartPill(
+                        label: item.displayStatus,
+                        tone: item.statusTone,
+                      ),
+                      SmartPill(
+                        label: item.displayLevel,
+                        tone: SmartTone.neutral,
+                      ),
+                      if (item.kpiId > 0)
+                        SmartPill(
+                          label: 'KPI #${item.kpiId}',
+                          tone: SmartTone.accent,
+                        ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  _TaskDetailRow(
+                    label: 'Mã giao việc',
+                    value: '#${item.processId}',
+                    icon: Icons.tag_outlined,
+                  ),
+                  _TaskDetailRow(
+                    label: 'Hạn xử lý',
+                    value: _formatDateLabel(item.dateExpired),
+                    icon: Icons.event_available_outlined,
+                  ),
+                  _TaskDetailRow(
+                    label: 'Trạng thái',
+                    value: item.displayStatus,
+                    icon: Icons.verified_outlined,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
+
+class _TaskDetailRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final IconData icon;
+
+  const _TaskDetailRow({
+    required this.label,
+    required this.value,
+    required this.icon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: SmartColors.soft,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, size: 18, color: SmartColors.accent),
+          ),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: AppTextStyles.caption.copyWith(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value.trim().isEmpty ? 'Chưa cập nhật' : value.trim(),
+                  style: AppTextStyles.bodyMedium.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+List<KpiProcessItem> _filteredTaskProcesses(
+  List<KpiProcessItem> items,
+  String query,
+  String status,
+) {
+  final normalizedQuery = query.trim().toLowerCase();
+  return items.where((item) {
+    final matchesStatus = switch (status) {
+      'overdue' => item.isLate,
+      'doing' => !item.isDone && !item.isLate,
+      'complete' => item.isDone,
+      _ => true,
+    };
+    if (!matchesStatus) return false;
+    if (normalizedQuery.isEmpty) return true;
+    final searchable = [
+      item.processId.toString(),
+      item.title,
+      item.statusName,
+      item.kpiId.toString(),
+    ].join(' ').toLowerCase();
+    return searchable.contains(normalizedQuery);
+  }).toList();
+}
+
+extension _TaskProcessUi on KpiProcessItem {
+  SmartTone get statusTone {
+    if (isLate) return SmartTone.danger;
+    if (isDone) return SmartTone.success;
+    if (statusId == 2) return SmartTone.warning;
+    return SmartTone.accent;
+  }
+
+  String get displayStatus {
+    if (isLate && !isDone) return 'Quá hạn';
+    if (statusName.trim().isNotEmpty) return statusName.trim();
+    if (isDone) return 'Hoàn thành';
+    return 'Đang xử lý';
+  }
+
+  bool get isUrgent => false;
+
+  String get displayLevel => 'Thường';
 }
 
 class _ProcessCreateScreen extends StatelessWidget {
@@ -895,11 +1302,13 @@ class _ProcessCreateScreen extends StatelessWidget {
       return _ScreenStack(
         children: [
           SmartScreenHeader(
-            backLabel: 'Giao việc',
-            onBack: () => controller.showView(AdminSmartView.tasks),
+            backLabel: 'Ứng dụng',
+            onBack: () => controller.showView(AdminSmartView.apps),
             eyebrow: 'Nghiệp vụ',
             title: 'Tạo giao việc',
           ),
+          if (controller.processCreateMessage.value != null)
+            _InlineSuccess(message: controller.processCreateMessage.value!),
           if (controller.isProcessDropdownLoading.value)
             const LinearProgressIndicator(),
           if (controller.processFormError.value != null)
@@ -984,21 +1393,23 @@ class _ProcessCreateScreen extends StatelessWidget {
                       child: _FormTextField(
                         label: 'File đính kèm',
                         controller: controller.processAttachmentController,
-                        hint:
-                            'Đường dẫn file (mỗi dòng một file)',
+                        hint: 'Đường dẫn file (mỗi dòng một file)',
                         maxLines: 3,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    Obx(
-                      () => SmartPrimaryButton(
-                        label: controller.isUploading.value
-                            ? 'Đang tải...'
-                            : 'Tải file',
-                        secondary: true,
-                        onTap: controller.isUploading.value
-                            ? null
-                            : controller.pickAndUploadProcessAttachment,
+                    SizedBox(
+                      width: 104,
+                      child: Obx(
+                        () => SmartPrimaryButton(
+                          label: controller.isUploading.value
+                              ? 'Đang tải...'
+                              : 'Tải file',
+                          secondary: true,
+                          onTap: controller.isUploading.value
+                              ? null
+                              : controller.pickAndUploadProcessAttachment,
+                        ),
                       ),
                     ),
                   ],

@@ -470,33 +470,47 @@ class SmartPrimaryButton extends StatelessWidget {
   final String label;
   final VoidCallback? onTap;
   final bool secondary;
+  final double? width;
 
   const SmartPrimaryButton({
     super.key,
     required this.label,
     this.onTap,
     this.secondary = false,
+    this.width,
   });
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      height: 42,
-      child: ElevatedButton(
-        onPressed: onTap,
-        style: ElevatedButton.styleFrom(
-          elevation: 0,
-          backgroundColor: secondary ? SmartColors.soft : SmartColors.accent,
-          foregroundColor: secondary
-              ? AppColors.textPrimary
-              : AppColors.textOnPrimary,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(14),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final effectiveWidth =
+            width ??
+            (constraints.maxWidth.isFinite ? constraints.maxWidth : null);
+        return SizedBox(
+          width: effectiveWidth,
+          height: 42,
+          child: ElevatedButton(
+            onPressed: onTap,
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              backgroundColor: secondary
+                  ? SmartColors.soft
+                  : SmartColors.accent,
+              foregroundColor: secondary
+                  ? AppColors.textPrimary
+                  : AppColors.textOnPrimary,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+              textStyle: AppTextStyles.body.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+            child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
           ),
-          textStyle: AppTextStyles.body.copyWith(fontWeight: FontWeight.w800),
-        ),
-        child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis),
-      ),
+        );
+      },
     );
   }
 }

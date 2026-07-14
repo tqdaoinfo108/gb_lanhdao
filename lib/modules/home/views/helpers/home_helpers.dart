@@ -5,7 +5,7 @@ String _taskStatusLabel(String value) {
     case 'overdue':
       return 'Quá hạn';
     case 'doing':
-      return 'Đang làm';
+      return 'Đang xử lý';
     case 'complete':
       return 'Hoàn thành';
     default:

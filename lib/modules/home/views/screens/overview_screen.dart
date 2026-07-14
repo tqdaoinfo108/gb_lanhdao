@@ -769,7 +769,7 @@ class _OverviewActionsRow extends StatelessWidget {
         _QuickAction(
           label: 'Địa điểm',
           icon: Icons.place_outlined,
-          onTap: () => controller.showView(AdminSmartView.digitalMap),
+          onTap: () => controller.showView(AdminSmartView.offices),
         ),
         _QuickAction(
           label: 'Ứng dụng',

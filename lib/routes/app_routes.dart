@@ -11,8 +11,6 @@ abstract class AppRoutes {
   // Main
   // ---------------------------------------------------------------------------
   static const home = '/home';
-  static const tasks = '/tasks';
-  static const taskDetail = '/task-detail';
   static const meetingSchedule = '/meeting-schedule';
 
   // ---------------------------------------------------------------------------

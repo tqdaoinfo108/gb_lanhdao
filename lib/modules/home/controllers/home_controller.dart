@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'dart:math';
 
 import 'package:flutter/material.dart';
@@ -6,27 +9,31 @@ import 'package:get/get.dart';
 import '../../../core/utils/auth_helper.dart';
 
 import '../../../data/models/agency_models.dart';
+import '../../../data/models/ai_assistant_models.dart';
 import '../../../data/models/dashboard_models.dart';
 import '../../../data/models/digital_map_models.dart';
+import '../../../data/models/document_models.dart';
 import '../../../data/models/kpi_models.dart';
 import '../../../data/models/office_models.dart';
 import '../../../data/models/process_models.dart';
+import '../../../data/models/residence_models.dart';
 import '../../../data/models/user_profile_models.dart';
 import '../../../data/models/urgent_alert_models.dart';
-import 'dart:io';
-
 import 'package:file_picker/file_picker.dart';
 
 import '../../../data/models/crime_report_models.dart';
 import '../../../data/services/file_upload_service.dart';
 import '../../../data/models/work_calendar_models.dart';
 import '../../../data/repositories/agency_repository.dart';
+import '../../../data/repositories/ai_assistant_repository.dart';
 import '../../../data/repositories/dashboard_repository.dart';
 import '../../../data/repositories/digital_map_repository.dart';
+import '../../../data/repositories/document_repository.dart';
 import '../../../data/repositories/kpi_repository.dart';
 import '../../../data/repositories/office_repository.dart';
 import '../../../data/repositories/process_repository.dart';
 import '../../../data/repositories/profile_repository.dart';
+import '../../../data/repositories/residence_repository.dart';
 import '../../../data/repositories/urgent_alert_repository.dart';
 import '../../../data/repositories/crime_report_repository.dart';
 import '../../../data/repositories/work_calendar_repository.dart';
@@ -39,6 +46,9 @@ enum AdminSmartView {
   crimeReportNew,
   aiAssistant,
   digitalMap,
+  offices,
+  residence,
+  documents,
   kpiPrograms,
   urgentAlerts,
   tasks,
@@ -61,7 +71,10 @@ class HomeController extends GetxController {
   final DashboardRepository _dashboardRepository;
   final ProcessRepository _processRepository;
   final AgencyRepository _agencyRepository;
+  final AiAssistantRepository _aiAssistantRepository;
   final DigitalMapRepository _digitalMapRepository;
+  final ResidenceRepository _residenceRepository;
+  final DocumentRepository _documentRepository;
   final OfficeRepository _officeRepository;
   final KpiRepository _kpiRepository;
   final ProfileRepository _profileRepository;
@@ -73,7 +86,10 @@ class HomeController extends GetxController {
     DashboardRepository? dashboardRepository,
     ProcessRepository? processRepository,
     AgencyRepository? agencyRepository,
+    AiAssistantRepository? aiAssistantRepository,
     DigitalMapRepository? digitalMapRepository,
+    ResidenceRepository? residenceRepository,
+    DocumentRepository? documentRepository,
     OfficeRepository? officeRepository,
     KpiRepository? kpiRepository,
     ProfileRepository? profileRepository,
@@ -83,7 +99,11 @@ class HomeController extends GetxController {
   }) : _dashboardRepository = dashboardRepository ?? DashboardRepository(),
        _processRepository = processRepository ?? ProcessRepository(),
        _agencyRepository = agencyRepository ?? AgencyRepository(),
+       _aiAssistantRepository =
+           aiAssistantRepository ?? AiAssistantRepository(),
        _digitalMapRepository = digitalMapRepository ?? DigitalMapRepository(),
+       _residenceRepository = residenceRepository ?? ResidenceRepository(),
+       _documentRepository = documentRepository ?? DocumentRepository(),
        _officeRepository = officeRepository ?? OfficeRepository(),
        _kpiRepository = kpiRepository ?? KpiRepository(),
        _profileRepository = profileRepository ?? ProfileRepository(),
@@ -106,6 +126,8 @@ class HomeController extends GetxController {
   final meetingHub = MeetingHubBundle.empty().obs;
   final agencyBundle = AgencyBundle.empty().obs;
   final digitalMapBundle = DigitalMapBundle.empty().obs;
+  final residenceBundle = ResidenceBundle.empty().obs;
+  final documentBundle = DocumentBundle.empty().obs;
   final officeBundle = OfficeBundle.empty().obs;
   final kpiBundle = KpiBundle.empty().obs;
   final processDropdowns = ProcessDropdownBundle.empty().obs;
@@ -145,8 +167,12 @@ class HomeController extends GetxController {
   final isMeetingLoading = false.obs;
   final isAgencyLoading = false.obs;
   final isDigitalMapLoading = false.obs;
+  final isResidenceLoading = false.obs;
+  final isDocumentLoading = false.obs;
   final isOfficeLoading = false.obs;
   final isKpiLoading = false.obs;
+  final isAiHistoryLoading = false.obs;
+  final isAiSending = false.obs;
   final isProcessDropdownLoading = false.obs;
   final isProcessCreating = false.obs;
   final isUrgentAlertLoading = false.obs;
@@ -154,8 +180,11 @@ class HomeController extends GetxController {
   final meetingError = RxnString();
   final agencyError = RxnString();
   final digitalMapError = RxnString();
+  final residenceError = RxnString();
+  final documentError = RxnString();
   final officeError = RxnString();
   final kpiError = RxnString();
+  final aiError = RxnString();
   final processFormError = RxnString();
   final urgentAlertError = RxnString();
   final processCreateMessage = RxnString();
@@ -166,6 +195,17 @@ class HomeController extends GetxController {
   final agencyStatusFilter = (-100).obs;
   final digitalMapTypeFilter = 0.obs;
   final digitalMapVillageFilter = 0.obs;
+  final residenceVillageFilter = 0.obs;
+  final residenceTypeFilter = 0.obs;
+  final residenceStatusFilter = (-100).obs;
+  final documentTypeFilter = (-100).obs;
+  final documentStatusFilter = (-100).obs;
+  final documentFieldFilter = 0.obs;
+  final documentMonth = DateTime(
+    DateTime.now().year,
+    DateTime.now().month,
+    1,
+  ).obs;
   final digitalMapBoundaryVisible = true.obs;
   final digitalMapOfficesVisible = true.obs;
   final officeStatusFilter = (-100).obs;
@@ -175,14 +215,17 @@ class HomeController extends GetxController {
   final taskQuery = ''.obs;
   final crimeQuery = ''.obs;
   final mapQuery = ''.obs;
+  final residenceQuery = ''.obs;
+  final documentQuery = ''.obs;
   final kpiQuery = ''.obs;
   final urgentQuery = ''.obs;
   final agencyQuery = ''.obs;
   final officeQuery = ''.obs;
   final anonymousReport = false.obs;
   final aiPrompt = ''.obs;
-  final aiDraft =
-      'AI có thể mắc lỗi. Vui lòng kiểm tra thông tin quan trọng.'.obs;
+  final aiMessages = <AiChatMessage>[].obs;
+  final aiHistory = AiHistoryPage.empty().obs;
+  final aiHistoryChatId = RxnInt();
 
   final overviewDepartmentLimit = 3.obs;
   final overviewKpiLimit = 5.obs;
@@ -195,17 +238,21 @@ class HomeController extends GetxController {
   final meetingBookingLimit = 5.obs;
   final crimeReportLimit = 3.obs;
   final urgentAlertLimit = 5.obs;
-  final taskLimit = 3.obs;
 
   final appSearchController = TextEditingController();
   final taskSearchController = TextEditingController();
   final crimeSearchController = TextEditingController();
   final mapSearchController = TextEditingController();
+  final residenceSearchController = TextEditingController();
+  final documentSearchController = TextEditingController();
   final kpiSearchController = TextEditingController();
   final urgentSearchController = TextEditingController();
   final agencySearchController = TextEditingController();
   final officeSearchController = TextEditingController();
   final aiPromptController = TextEditingController();
+  StreamSubscription<dynamic>? _aiSocketSubscription;
+  WebSocket? _aiSocket;
+  Timer? _aiFinishTimer;
   final crimeNameController = TextEditingController();
   final crimePhoneController = TextEditingController();
   final crimeTitleController = TextEditingController();
@@ -615,6 +662,124 @@ class HomeController extends GetxController {
     digitalMapVillageFilter.value = villageId;
   }
 
+  Future<void> fetchResidence() async {
+    isResidenceLoading.value = true;
+    residenceError.value = null;
+    try {
+      residenceBundle.value = await _residenceRepository.getBundle(
+        key: residenceQuery.value.trim(),
+        villageId: residenceVillageFilter.value,
+        typeHouseHoldId: residenceTypeFilter.value,
+        statusId: residenceStatusFilter.value,
+      );
+    } catch (e) {
+      residenceError.value = 'Không tải được dữ liệu dân cư và hộ gia đình: $e';
+    } finally {
+      isResidenceLoading.value = false;
+    }
+  }
+
+  void searchResidence(String value) {
+    residenceQuery.value = value;
+    fetchResidence();
+  }
+
+  void setResidenceVillageFilter(int villageId) {
+    residenceVillageFilter.value = villageId;
+    fetchResidence();
+  }
+
+  void setResidenceTypeFilter(int typeId) {
+    residenceTypeFilter.value = typeId;
+    fetchResidence();
+  }
+
+  void setResidenceStatusFilter(int statusId) {
+    residenceStatusFilter.value = statusId;
+    fetchResidence();
+  }
+
+  void clearResidenceFilters() {
+    residenceVillageFilter.value = 0;
+    residenceTypeFilter.value = 0;
+    residenceStatusFilter.value = -100;
+    residenceQuery.value = '';
+    residenceSearchController.clear();
+    fetchResidence();
+  }
+
+  Future<void> fetchDocuments() async {
+    isDocumentLoading.value = true;
+    documentError.value = null;
+    try {
+      final bundle = await _documentRepository.getBundle(
+        monthYear: documentMonth.value,
+        key: documentQuery.value.trim(),
+        statusId: documentStatusFilter.value,
+        typeDocumentId: documentTypeFilter.value,
+      );
+      documentBundle.value = _filterDocumentBundleByField(bundle);
+    } catch (e) {
+      documentError.value = 'Không tải được dữ liệu văn bản: $e';
+    } finally {
+      isDocumentLoading.value = false;
+    }
+  }
+
+  void searchDocuments(String value) {
+    documentQuery.value = value;
+    fetchDocuments();
+  }
+
+  void setDocumentTypeFilter(int typeDocumentId) {
+    documentTypeFilter.value = typeDocumentId;
+    fetchDocuments();
+  }
+
+  void setDocumentStatusFilter(int statusId) {
+    documentStatusFilter.value = statusId;
+    fetchDocuments();
+  }
+
+  void setDocumentFieldFilter(int fieldId) {
+    documentFieldFilter.value = fieldId;
+    fetchDocuments();
+  }
+
+  void moveDocumentMonth(int direction) {
+    final current = documentMonth.value;
+    documentMonth.value = DateTime(current.year, current.month + direction, 1);
+    fetchDocuments();
+  }
+
+  void clearDocumentFilters() {
+    documentTypeFilter.value = -100;
+    documentStatusFilter.value = -100;
+    documentFieldFilter.value = 0;
+    documentQuery.value = '';
+    documentSearchController.clear();
+    fetchDocuments();
+  }
+
+  DocumentBundle _filterDocumentBundleByField(DocumentBundle source) {
+    if (documentFieldFilter.value == 0) return source;
+    final filtered = source.documents.documents
+        .where((item) => item.fieldId == documentFieldFilter.value)
+        .toList();
+    return DocumentBundle(
+      documents: DocumentPage(
+        totals: filtered.length,
+        totalByMonth: source.documents.totalByMonth,
+        totalReceived: source.documents.totalReceived,
+        totalSent: source.documents.totalSent,
+        totalNeedView: source.documents.totalNeedView,
+        documents: filtered,
+      ),
+      fields: source.fields,
+      notifications: source.notifications,
+    );
+  }
+
   void toggleDigitalMapBoundary() {
     digitalMapBoundaryVisible.value = !digitalMapBoundaryVisible.value;
   }
@@ -632,7 +797,7 @@ class HomeController extends GetxController {
         typeOfficeId: officeTypeFilter.value,
         statusId: officeStatusFilter.value,
         page: 1,
-        limit: 10,
+        limit: 100,
       );
     } catch (e) {
       officeError.value = 'Không tải được danh sách địa điểm: $e';
@@ -673,6 +838,14 @@ class HomeController extends GetxController {
 
   void showView(AdminSmartView view) {
     currentView.value = view;
+    if (view == AdminSmartView.aiAssistant &&
+        aiHistory.value.items.isEmpty &&
+        !isAiHistoryLoading.value) {
+      fetchAiHistory();
+    }
+    if (view == AdminSmartView.aiAssistant && aiMessages.isEmpty) {
+      _setDefaultAiGreeting();
+    }
     if (view == AdminSmartView.urgentAlerts &&
         urgentAlertBundle.value.information.items.isEmpty &&
         !isUrgentAlertLoading.value) {
@@ -692,6 +865,21 @@ class HomeController extends GetxController {
         crimeReportBundle.value.types.items.isEmpty &&
         !isCrimeReportLoading.value) {
       fetchCrimeReports();
+    }
+    if (view == AdminSmartView.residence &&
+        residenceBundle.value.households.households.isEmpty &&
+        !isResidenceLoading.value) {
+      fetchResidence();
+    }
+    if (view == AdminSmartView.documents &&
+        documentBundle.value.documents.documents.isEmpty &&
+        !isDocumentLoading.value) {
+      fetchDocuments();
+    }
+    if (view == AdminSmartView.offices &&
+        officeBundle.value.officePage.offices.isEmpty &&
+        !isOfficeLoading.value) {
+      fetchOffices();
     }
   }
 
@@ -905,6 +1093,7 @@ class HomeController extends GetxController {
           'Đã tạo giao việc #${created.processId} cho ${created.userNameProcess}.';
       _resetProcessFormAfterCreate();
       showView(AdminSmartView.tasks);
+      await fetchKpiPrograms();
     } catch (e) {
       processFormError.value = 'Không tạo được giao việc: $e';
     } finally {
@@ -956,6 +1145,9 @@ class HomeController extends GetxController {
       case AdminSmartView.crimeReportNew:
       case AdminSmartView.aiAssistant:
       case AdminSmartView.digitalMap:
+      case AdminSmartView.offices:
+      case AdminSmartView.residence:
+      case AdminSmartView.documents:
       case AdminSmartView.kpiPrograms:
       case AdminSmartView.urgentAlerts:
       case AdminSmartView.periodicReport:
@@ -975,15 +1167,63 @@ class HomeController extends GetxController {
     }
   }
 
-  void sendAiPrompt() {
+  Future<void> fetchAiHistory() async {
+    isAiHistoryLoading.value = true;
+    aiError.value = null;
+    try {
+      aiHistory.value = await _aiAssistantRepository.getHistory();
+    } catch (e) {
+      aiError.value = 'Không thể tải lịch sử hội thoại: $e';
+    } finally {
+      isAiHistoryLoading.value = false;
+    }
+  }
+
+  Future<void> sendAiPrompt() async {
     final prompt = aiPromptController.text.trim();
     if (prompt.isEmpty) {
-      aiDraft.value = 'Nhập nội dung cần AI hỗ trợ trước khi gửi.';
+      aiError.value = 'Nhập nội dung cần AI hỗ trợ trước khi gửi.';
       return;
     }
+    if (isAiSending.value) return;
+
+    aiError.value = null;
     aiPrompt.value = prompt;
-    aiDraft.value =
-        'Đã tạo nháp xử lý cho yêu cầu: "$prompt". Vui lòng rà soát trước khi phát hành.';
+    aiPromptController.clear();
+    aiMessages.add(
+      AiChatMessage(
+        id: 'user-${DateTime.now().microsecondsSinceEpoch}',
+        role: AiChatRole.user,
+        content: prompt,
+        createdAt: DateTime.now(),
+      ),
+    );
+    isAiSending.value = true;
+    try {
+      if (aiHistoryChatId.value == null) {
+        final id = await _aiAssistantRepository.createHistory(
+          title: _aiHistoryTitle(prompt),
+          content: _aiHistoryContent(),
+        );
+        if (id <= 0) throw Exception('Máy chủ không trả về mã cuộc trò chuyện');
+        aiHistoryChatId.value = id;
+      }
+      await _connectAiSocket();
+      _aiSocket!.add(prompt);
+      _armAiResponseTimeout();
+    } catch (e) {
+      isAiSending.value = false;
+      aiMessages.add(
+        AiChatMessage(
+          id: 'error-${DateTime.now().microsecondsSinceEpoch}',
+          role: AiChatRole.assistant,
+          content:
+              'Không thể kết nối AI lúc này. Vui lòng thử lại.\n\nChi tiết: $e',
+          createdAt: DateTime.now(),
+        ),
+      );
+      await _saveAiHistory();
+    }
   }
 
   void useAiSuggestion(String suggestion) {
@@ -992,10 +1232,296 @@ class HomeController extends GetxController {
   }
 
   void resetAiChat() {
+    _aiSocketSubscription?.cancel();
+    _aiSocket?.close();
+    _aiSocketSubscription = null;
+    _aiSocket = null;
     aiPromptController.clear();
     aiPrompt.value = '';
-    aiDraft.value =
-        'AI có thể mắc lỗi. Vui lòng kiểm tra thông tin quan trọng.';
+    aiError.value = null;
+    aiHistoryChatId.value = null;
+    aiMessages.clear();
+    _setDefaultAiGreeting();
+  }
+
+  void _setDefaultAiGreeting() {
+    if (aiMessages.isNotEmpty) return;
+    aiMessages.add(
+      AiChatMessage(
+        id: 'msg-001',
+        role: AiChatRole.assistant,
+        content:
+            'Xin chào! Tôi là AI Hỗ trợ của AdminSmart. Tôi có thể giúp bạn:\n\n'
+            '**Phân tích dữ liệu** KPI, nhiệm vụ, dân cư\n\n'
+            '**Soạn thảo văn bản** thông báo, báo cáo, biên bản\n\n'
+            '**Tóm tắt thông tin** từ các cuộc họp và dữ liệu hệ thống\n\n'
+            '**Đề xuất giải pháp** cho các vấn đề quản lý\n\n'
+            'Bạn cần hỗ trợ gì hôm nay?',
+        createdAt: DateTime.now(),
+      ),
+    );
+  }
+
+  String _aiHistoryTitle(String prompt) {
+    final compact = prompt.replaceAll(RegExp(r'\s+'), ' ').trim();
+    if (compact.length <= 64) return compact;
+    return '${compact.substring(0, 61)}...';
+  }
+
+  String _aiHistoryContent() =>
+      jsonEncode(aiMessages.map((item) => item.toJson()).toList());
+
+  Future<void> analyzeCurrentMonthKpi() async {
+    if (isAiSending.value) return;
+    final now = DateTime.now();
+    aiError.value = null;
+    try {
+      final summary = await _aiAssistantRepository.getMonthlyKpiSummary(
+        month: now.month,
+        year: now.year,
+      );
+      aiPromptController.text = _kpiAnalysisPrompt(summary);
+      await sendAiPrompt();
+    } catch (e) {
+      aiError.value = 'Không thể chuẩn bị phân tích KPI: $e';
+    }
+  }
+
+  Future<void> analyzeCurrentMonthProcesses() async {
+    if (isAiSending.value) return;
+    final now = DateTime.now();
+    try {
+      final summary = await _aiAssistantRepository.getMonthlyProcessSummary(
+        month: now.month,
+        year: now.year,
+      );
+      aiPromptController.text = _processAnalysisPrompt(summary);
+      await sendAiPrompt();
+    } catch (e) {
+      aiError.value = 'Không thể chuẩn bị phân tích công việc: $e';
+    }
+  }
+
+  Future<void> analyzeCurrentMonthResidence() async {
+    if (isAiSending.value) return;
+    final now = DateTime.now();
+    try {
+      final summary = await _aiAssistantRepository.getMonthlyResidenceSummary(
+        month: now.month,
+        year: now.year,
+      );
+      aiPromptController.text = _residenceAnalysisPrompt(summary);
+      await sendAiPrompt();
+    } catch (e) {
+      aiError.value = 'Không thể chuẩn bị phân tích dân cư: $e';
+    }
+  }
+
+  Future<void> analyzeCurrentMonthBookings() async {
+    if (isAiSending.value) return;
+    final now = DateTime.now();
+    try {
+      final summary = await _aiAssistantRepository.getMonthlyBookingSummary(
+        month: now.month,
+        year: now.year,
+      );
+      aiPromptController.text = _bookingAnalysisPrompt(summary);
+      await sendAiPrompt();
+    } catch (e) {
+      aiError.value = 'Không thể chuẩn bị tổng hợp lịch họp: $e';
+    }
+  }
+
+  Future<void> _connectAiSocket() async {
+    if (_aiSocket != null) return;
+    final socket = await WebSocket.connect('wss://aichatbot.gvbsoft.vn/ws');
+    _aiSocket = socket;
+    _aiSocketSubscription = socket.listen(
+      _handleAiSocketData,
+      onError: (Object _) => _finishAiResponse(),
+      onDone: _finishAiResponse,
+      cancelOnError: false,
+    );
+  }
+
+  void _handleAiSocketData(dynamic data) {
+    final text = _aiSocketText(data);
+    if (text.isEmpty) return;
+    final isDone = _isAiResponseDone(text);
+    final message = _aiResponseContent(text);
+    if (message.isNotEmpty) {
+      final index = aiMessages.indexWhere(
+        (item) => item.id == 'assistant-stream',
+      );
+      if (index < 0) {
+        aiMessages.add(
+          AiChatMessage(
+            id: 'assistant-stream',
+            role: AiChatRole.assistant,
+            content: message,
+            createdAt: DateTime.now(),
+          ),
+        );
+      } else {
+        aiMessages[index] = aiMessages[index].copyWith(
+          content: '${aiMessages[index].content}$message',
+        );
+      }
+      _armAiResponseTimeout();
+    }
+    if (isDone) _finishAiResponse();
+  }
+
+  String _aiSocketText(dynamic data) {
+    if (data is String) return data;
+    if (data is List<int>) return utf8.decode(data, allowMalformed: true);
+    return '$data';
+  }
+
+  String _aiResponseContent(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      if (decoded is Map) {
+        final nestedMessage = decoded['message'];
+        if (nestedMessage is Map) {
+          final content = nestedMessage['content'];
+          if (content is String) return content;
+        }
+        for (final key in ['content', 'message', 'text', 'response', 'data']) {
+          final value = decoded[key];
+          if (value is String) return value;
+        }
+        return '';
+      }
+    } catch (_) {
+      // The chatbot may stream plain text chunks.
+    }
+    return raw;
+  }
+
+  bool _isAiResponseDone(String raw) {
+    try {
+      final decoded = jsonDecode(raw);
+      return decoded is Map && decoded['done'] == true;
+    } catch (_) {
+      return false;
+    }
+  }
+
+  void _armAiResponseTimeout() {
+    _aiFinishTimer?.cancel();
+    _aiFinishTimer = Timer(const Duration(seconds: 90), _finishAiResponse);
+  }
+
+  Future<void> _finishAiResponse() async {
+    if (!isAiSending.value && _aiSocket == null) return;
+    final streamIndex = aiMessages.indexWhere(
+      (item) => item.id == 'assistant-stream',
+    );
+    if (streamIndex >= 0) {
+      final item = aiMessages[streamIndex];
+      aiMessages[streamIndex] = AiChatMessage(
+        id: 'assistant-${DateTime.now().microsecondsSinceEpoch}',
+        role: item.role,
+        content: item.content,
+        createdAt: item.createdAt,
+      );
+    }
+    isAiSending.value = false;
+    _aiFinishTimer?.cancel();
+    _aiFinishTimer = null;
+    _aiSocketSubscription = null;
+    await _aiSocket?.close();
+    _aiSocket = null;
+    await _saveAiHistory();
+    await fetchAiHistory();
+  }
+
+  Future<void> _saveAiHistory() async {
+    final historyId = aiHistoryChatId.value;
+    if (historyId == null || aiMessages.isEmpty) return;
+    try {
+      await _aiAssistantRepository.updateHistory(
+        historyChatId: historyId,
+        content: _aiHistoryContent(),
+      );
+    } catch (_) {
+      // Chat remains usable when saving history temporarily fails.
+    }
+  }
+
+  String _kpiAnalysisPrompt(AiMonthlyKpiSummary summary) {
+    final details = summary.kpis
+        .map(
+          (item) =>
+              '${item.name} thuộc phòng ${item.departmentName}: '
+              '${item.statusName} (Thực tế đạt: ${item.reality}/${item.target} ${item.unit})',
+        )
+        .join('; ');
+    return 'Dưới đây là số liệu thực hiện KPI tháng ${summary.month}/${summary.year}:\n'
+        'Dữ liệu KPI tháng ${summary.month}/${summary.year}:\n'
+        '- Tổng số chương trình/KPI: ${summary.totalKpi}\n'
+        '- Đã hoàn thành: ${summary.completed}\n'
+        '- Đúng tiến độ: ${summary.onTrack}\n'
+        '- Có rủi ro: ${summary.atRisk}\n'
+        '- Chậm tiến độ: ${summary.delayed}\n'
+        '- Tỷ lệ hoàn thành: ${summary.completionRate}%\n'
+        '- Tỷ lệ rủi ro/chậm tiến độ: ${summary.atRiskRate}%\n'
+        '- Chi tiết tình hình thực hiện: $details.\n\n'
+        'Hãy tóm tắt tình hình thực hiện KPI tháng này, đánh giá các chương trình có rủi ro hoặc chậm tiến độ và đưa ra khuyến nghị xử lý.';
+  }
+
+  String _processAnalysisPrompt(AiMonthlyProcessSummary summary) {
+    final overdue = summary.processes
+        .where((item) => item.statusName.toLowerCase().contains('quá hạn'))
+        .toList();
+    final details = overdue.isEmpty
+        ? 'Không có nhiệm vụ quá hạn.'
+        : overdue
+              .asMap()
+              .entries
+              .map((entry) {
+                final item = entry.value;
+                final date = item.dateExpired;
+                final deadline = date == null
+                    ? 'Chưa cập nhật'
+                    : '${date.day}/${date.month}/${date.year}';
+                return '${entry.key + 1}. "${item.title}" do ${item.userNameProcess} chịu trách nhiệm '
+                    '(Hạn chót: $deadline, Độ ưu tiên: ${item.levelName}, Nguồn: ${item.typeSourceName}, '
+                    'Số hiệu tham chiếu: ${item.codeReference}, Mô tả: ${item.description})';
+              })
+              .join('\n');
+    return 'Dưới đây là số liệu nhiệm vụ và tình hình thực hiện công việc tháng ${summary.month}/${summary.year}:\n'
+        'Dữ liệu nhiệm vụ tháng ${summary.month}/${summary.year}:\n'
+        '- Tổng số nhiệm vụ: ${summary.total}\n'
+        '- Đã hoàn thành: ${summary.completed}\n'
+        '- Đang thực hiện: ${summary.inProgress}\n'
+        '- Chưa bắt đầu: ${summary.notStarted}\n'
+        '- Chờ duyệt: ${summary.pendingApproval}\n'
+        '- Quá hạn: ${summary.overdue}\n'
+        '- Chi tiết các nhiệm vụ quá hạn:\n$details\n\n'
+        'Hãy tập trung phân tích kỹ các nhiệm vụ đang bị quá hạn, đánh giá mức độ rủi ro dựa trên độ ưu tiên và nguồn công việc, và đề xuất các giải pháp/chỉ đạo cụ thể giúp hoàn thành các nhiệm vụ này.';
+  }
+
+  String _residenceAnalysisPrompt(AiMonthlyResidenceSummary summary) =>
+      'Dưới đây là số liệu dân số, hộ gia đình và biến động dân cư tháng ${summary.month}/${summary.year}:\n'
+      'Dữ liệu dân cư và hộ gia đình tháng ${summary.month}/${summary.year}:\n'
+      '- Tổng số hộ: ${summary.totalHouseholds} hộ (trong đó: ${summary.poorHouseholds} hộ nghèo, ${summary.policyHouseholds} hộ chính sách, ${summary.newHouseholds} hộ mới thêm).\n'
+      '- Tổng nhân khẩu: ${summary.totalPopulation} người (Nam: ${summary.totalMale}, Nữ: ${summary.totalFemale}, Trẻ em: ${summary.totalChildren}, Người cao tuổi: ${summary.totalElderly}, Mới thêm trong tháng: ${summary.newMembers}).\n\n'
+      'Hãy phân tích, nhận xét chi tiết về các số liệu này và đề xuất giải pháp quản lý phù hợp.';
+
+  String _bookingAnalysisPrompt(AiMonthlyBookingSummary summary) {
+    final byType = summary.byType
+        .map((item) => '${item.name}: ${item.count} cuộc')
+        .join('; ');
+    return 'Dưới đây là số liệu lịch họp tháng ${summary.month}/${summary.year}:\n'
+        'Dữ liệu lịch họp tháng ${summary.month}/${summary.year}:\n'
+        '- Tổng số cuộc họp: ${summary.total} (Đã kết thúc: ${summary.ended}, Sắp diễn ra: ${summary.upcoming}, Đang diễn ra: ${summary.ongoing}, Đã hủy: ${summary.cancelled})\n'
+        '- Tổng lượt tham gia: ${summary.participants}\n'
+        '- Đã có kết luận chỉ đạo: ${summary.withConclusion} cuộc họp\n'
+        '- Chưa có kết luận chỉ đạo: ${summary.withoutConclusion} cuộc họp\n'
+        '- Thống kê theo loại cuộc họp: ${byType.isEmpty ? 'Chưa có dữ liệu.' : '$byType.'}\n\n'
+        'Hãy tổng hợp các thông tin cuộc họp này, nêu bật các số liệu thống kê quan trọng và phân tích tình hình tổ chức họp.';
   }
 
   @override
@@ -1008,7 +1534,12 @@ class HomeController extends GetxController {
     urgentSearchController.dispose();
     agencySearchController.dispose();
     officeSearchController.dispose();
+    residenceSearchController.dispose();
+    documentSearchController.dispose();
     aiPromptController.dispose();
+    _aiSocketSubscription?.cancel();
+    _aiSocket?.close();
+    _aiFinishTimer?.cancel();
     crimeNameController.dispose();
     crimePhoneController.dispose();
     crimeTitleController.dispose();
@@ -1252,8 +1783,6 @@ class HomeController extends GetxController {
         return crimeReportLimit;
       case 'urgent_alerts':
         return urgentAlertLimit;
-      case 'tasks':
-        return taskLimit;
     }
     return null;
   }
@@ -1282,8 +1811,6 @@ class HomeController extends GetxController {
         return 3;
       case 'urgent_alerts':
         return 5;
-      case 'tasks':
-        return 3;
     }
     return 0;
   }
