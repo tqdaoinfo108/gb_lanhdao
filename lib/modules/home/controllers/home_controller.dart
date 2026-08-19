@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../../core/utils/auth_helper.dart';
+import '../../../routes/app_routes.dart';
 
 import '../../../data/models/agency_models.dart';
 import '../../../data/models/ai_assistant_models.dart';
@@ -430,6 +431,15 @@ class HomeController extends GetxController {
     } finally {
       isProfileSaving.value = false;
     }
+  }
+
+  void logout() {
+    unawaited(_logout());
+  }
+
+  Future<void> _logout() async {
+    await AuthHelper.clearToken();
+    Get.offAllNamed(AppRoutes.login);
   }
 
   // ---------------------------------------------------------------------------

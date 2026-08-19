@@ -9,10 +9,11 @@ class _AccountScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return _ScreenStack(
       children: [
-        const SmartScreenHeader(
+        SmartScreenHeader(
           eyebrow: 'Cá nhân',
           title: 'Tài khoản',
           actionLabel: 'Đăng xuất',
+          onAction: controller.logout,
         ),
         Obx(() {
           final profile = controller.profile.value;
