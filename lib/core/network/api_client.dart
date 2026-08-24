@@ -4,7 +4,7 @@ import '../utils/auth_helper.dart';
 /// Base API Client dùng GetConnect.
 /// Mọi Service đều kế thừa class này.
 class ApiClient extends GetConnect {
-  static const String _baseUrl = 'https://apilanhdao.gvbsoft.vn/api';
+  static const String _baseUrl = 'http://apigiongtrom.gvbsoft.com/api';
   static const String _skipAuthHeader = 'X-Skip-Authorization';
 
   @override
@@ -20,16 +20,22 @@ class ApiClient extends GetConnect {
         // API yêu cầu format: Authorization: uid... (không có "Bearer")
         request.headers['Authorization'] = token;
       }
-      request.headers['Content-Type'] = 'application/json';
-      request.headers['Accept'] = 'application/json';
+      // GetConnect tự đặt multipart/form-data (kèm boundary) cho FormData.
+      // Chỉ thêm JSON khi request chưa có content type để không ghi đè multipart.
+      if (!request.headers.containsKey('content-type')) {
+        request.headers.putIfAbsent('content-type', () => 'application/json');
+      }
+      request.headers.putIfAbsent('accept', () => 'application/json');
       return request;
-    });   
+    });
 
     // Log response lỗi (chỉ debug)
     httpClient.addResponseModifier((request, response) async {
       if (!response.isOk) {
         // ignore: avoid_print
-        print('[API ERROR] ${request.method} ${request.url} → ${response.statusCode}');
+        print(
+          '[API ERROR] ${request.method} ${request.url} → ${response.statusCode}',
+        );
         // ignore: avoid_print
         print('[API ERROR BODY] ${response.bodyString}');
       }

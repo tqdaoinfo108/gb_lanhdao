@@ -10,14 +10,14 @@ class _PeriodicReportScreen extends StatelessWidget {
     return Obx(() {
       final bundle = controller.periodicReport.value;
       final summary = bundle.summary;
-      final notifications = bundle.notifications.items;
+      final selectedPeriod = controller.selectedReportPeriod.value;
 
       return _ScreenStack(
         children: [
           SmartScreenHeader(
             eyebrow: 'Báo cáo',
-            title: 'Báo cáo định kỳ',
-            badge: 'Kỳ 2',
+            title: 'Báo cáo tổng hợp',
+            badge: selectedPeriod.label,
             actionLabel: 'Làm mới',
             onAction: controller.fetchPeriodicReport,
           ),
@@ -28,17 +28,21 @@ class _PeriodicReportScreen extends StatelessWidget {
               message: controller.periodicReportError.value!,
               onRetry: controller.fetchPeriodicReport,
             ),
+          _ReportPeriodSelector(
+            selected: selectedPeriod,
+            onSelected: controller.selectReportPeriod,
+          ),
           SmartStatGrid(
             compact: true,
             stats: [
               SmartStatData(
                 value: summary.totalCurProcess.toString(),
-                label: 'Công việc kỳ này',
+                label: 'Công việc ${selectedPeriod.label.toLowerCase()}',
                 tone: SmartTone.accent,
               ),
               SmartStatData(
                 value: summary.totalCurDocument.toString(),
-                label: 'Văn bản kỳ này',
+                label: 'Văn bản ${selectedPeriod.label.toLowerCase()}',
                 tone: SmartTone.success,
               ),
             ],
@@ -48,7 +52,7 @@ class _PeriodicReportScreen extends StatelessWidget {
             stats: [
               SmartStatData(
                 value: summary.totalCurBooking.toString(),
-                label: 'Lịch họp kỳ này',
+                label: 'Lịch họp ${selectedPeriod.label.toLowerCase()}',
                 tone: SmartTone.warning,
               ),
               SmartStatData(
@@ -155,37 +159,74 @@ class _PeriodicReportScreen extends StatelessWidget {
                 bundle.trends.length,
               ),
             ),
-          SmartSectionHeader(
-            title: 'Thông báo gần đây',
-            actionLabel: '${bundle.notifications.totals}',
-          ),
-          if (notifications.isEmpty)
-            const _EmptyState(
-              title: 'Chưa có thông báo',
-              note: 'Hệ thống sẽ hiển thị thông báo khi có phát sinh mới.',
-            )
-          else
-            ...notifications
-                .take(
-                  controller.visibleCount(
-                    'period_notifications',
-                    notifications.length,
-                  ),
-                )
-                .map((item) => _NotificationCard(item: item)),
-          if (notifications.length > 5)
-            _LoadMoreRow(
-              isExpanded: controller.isExpanded(
-                'period_notifications',
-                notifications.length,
-              ),
-              onTap: () => controller.toggleLoadMore(
-                'period_notifications',
-                notifications.length,
-              ),
-            ),
         ],
       );
     });
+  }
+}
+
+class _ReportPeriodSelector extends StatelessWidget {
+  final ReportPeriod selected;
+  final ValueChanged<ReportPeriod> onSelected;
+
+  const _ReportPeriodSelector({
+    required this.selected,
+    required this.onSelected,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SmartCard(
+      padding: const EdgeInsets.all(6),
+      child: Row(
+        children: ReportPeriod.values
+            .map(
+              (period) => Expanded(
+                child: _ReportPeriodOption(
+                  label: period.label,
+                  selected: period == selected,
+                  onTap: () => onSelected(period),
+                ),
+              ),
+            )
+            .toList(),
+      ),
+    );
+  }
+}
+
+class _ReportPeriodOption extends StatelessWidget {
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ReportPeriodOption({
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        decoration: BoxDecoration(
+          color: selected ? SmartColors.accent : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          textAlign: TextAlign.center,
+          style: AppTextStyles.caption.copyWith(
+            color: selected ? Colors.white : AppColors.textSecondary,
+            fontWeight: FontWeight.w800,
+          ),
+        ),
+      ),
+    );
   }
 }

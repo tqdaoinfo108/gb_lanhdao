@@ -18,12 +18,15 @@ import '../../../data/models/residence_models.dart';
 import '../../../data/models/urgent_alert_models.dart';
 import '../../../data/models/crime_report_models.dart';
 import '../../../data/models/work_calendar_models.dart';
+import '../../../data/models/quality_report_models.dart';
 import '../../../widgets/admin_smart_ui.dart';
 import '../controllers/home_controller.dart';
 
 part 'widgets/shell_widgets.dart';
 part 'screens/overview_screen.dart';
 part 'screens/periodic_report_screen.dart';
+part 'screens/quality_report_screen.dart';
+part 'screens/quality_year_report_screen.dart';
 part 'screens/meeting_schedule_screen.dart';
 part 'screens/work_calendar_screen.dart';
 part 'screens/apps_screen.dart';
@@ -32,6 +35,7 @@ part 'screens/ai_assistant_screen.dart';
 part 'screens/digital_map_screen.dart';
 part 'screens/offices_screen.dart';
 part 'screens/residence_screen.dart';
+part 'screens/residence_change_screen.dart';
 part 'screens/documents_screen.dart';
 part 'screens/kpi_programs_screen.dart';
 part 'screens/agencies_screen.dart';
@@ -117,6 +121,8 @@ class HomeScreen extends GetView<HomeController> {
         return _OfficesScreen(controller: controller);
       case AdminSmartView.residence:
         return _ResidenceScreen(controller: controller);
+      case AdminSmartView.residenceChange:
+        return _ResidenceChangeScreen(controller: controller);
       case AdminSmartView.documents:
         return _DocumentsScreen(controller: controller);
       case AdminSmartView.kpiPrograms:
@@ -129,6 +135,10 @@ class HomeScreen extends GetView<HomeController> {
         return _ProcessCreateScreen(controller: controller);
       case AdminSmartView.periodicReport:
         return _PeriodicReportScreen(controller: controller);
+      case AdminSmartView.qualityReport:
+        return _QualityReportScreen(controller: controller);
+      case AdminSmartView.qualityYearReport:
+        return _QualityYearReportScreen(controller: controller);
       case AdminSmartView.meetingSchedule:
         return _MeetingScheduleScreen(controller: controller);
       case AdminSmartView.agencies:

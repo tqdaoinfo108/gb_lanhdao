@@ -31,7 +31,7 @@ class _OverviewScreen extends StatelessWidget {
             hint: 'Chỉ tiêu chậm tiến độ',
             icon: Icons.trending_down_rounded,
             tone: SmartTone.danger,
-            onTap: () => controller.showView(AdminSmartView.kpiPrograms),
+            onTap: () => controller.showView(AdminSmartView.tasks),
           ),
         if (summary.totalProcessUndone > 0)
           _AttentionData(
@@ -757,24 +757,24 @@ class _OverviewActionsRow extends StatelessWidget {
     return Row(
       children: [
         _QuickAction(
-          label: 'KPI',
-          icon: Icons.query_stats_rounded,
-          onTap: () => controller.showView(AdminSmartView.kpiPrograms),
+          label: 'Bản đồ',
+          icon: Icons.map_outlined,
+          onTap: () => controller.showView(AdminSmartView.digitalMap),
         ),
         _QuickAction(
-          label: 'Giao việc',
+          label: 'Hộ dân',
+          icon: Icons.groups_outlined,
+          onTap: () => controller.showView(AdminSmartView.residence),
+        ),
+        _QuickAction(
+          label: 'Lịch họp',
+          icon: Icons.event_note_rounded,
+          onTap: () => controller.showView(AdminSmartView.meetingSchedule),
+        ),
+        _QuickAction(
+          label: 'Công việc',
           icon: Icons.task_alt_rounded,
           onTap: () => controller.showView(AdminSmartView.tasks),
-        ),
-        _QuickAction(
-          label: 'Địa điểm',
-          icon: Icons.place_outlined,
-          onTap: () => controller.showView(AdminSmartView.offices),
-        ),
-        _QuickAction(
-          label: 'Ứng dụng',
-          icon: Icons.apps_rounded,
-          onTap: () => controller.showView(AdminSmartView.apps),
         ),
       ],
     );
@@ -808,7 +808,7 @@ class _PriorityKpiPanel extends StatelessWidget {
                 ),
                 SmartTextButton(
                   label: 'Xem tất cả',
-                  onTap: () => controller.showView(AdminSmartView.kpiPrograms),
+                  onTap: () => controller.showView(AdminSmartView.tasks),
                 ),
               ],
             ),

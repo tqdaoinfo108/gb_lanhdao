@@ -20,8 +20,8 @@ class _DigitalMapScreen extends StatelessWidget {
           SmartScreenHeader(
             backLabel: 'Ứng dụng',
             onBack: () => controller.showView(AdminSmartView.apps),
-            eyebrow: ward?.wardName ?? 'Địa bàn',
-            title: 'Bản đồ số',
+            eyebrow: ward?.wardName ?? 'Bản đồ số trực quan',
+            title: 'GIS Maps',
             badge: '${offices.length} địa điểm',
             actionLabel: 'Làm mới',
             onAction: controller.fetchDigitalMap,

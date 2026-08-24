@@ -10,6 +10,7 @@ import '../../../core/values/app_text_styles.dart';
 import '../../../routes/app_routes.dart';
 import '../../../widgets/admin_smart_ui.dart';
 import '../../../widgets/app_button.dart';
+import '../../../data/services/push_notification_service.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -24,8 +25,6 @@ class _LoginScreenState extends State<LoginScreen> {
   static const _authPassword = 'UserPassAPILeaderDashboard';
   static const _platform = 'Web';
   static const _deviceName = 'Chrome';
-  static const _deviceToken =
-      'eD2jj4RwG-s7bEiiZ8COwA:APA91bGMrAGmYHFkdktwVpxCNgLomzBbTB98BLdI163s2AYj6uoaI9_mHZdUTzhN5M7Cn_v8rB3lGrbcZyRmCp5VIJLEh5cZQNKSW2WbWfIjoYfGhp3YagE';
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -74,12 +73,14 @@ class _LoginScreenState extends State<LoginScreen> {
     final email = _emailController.text.trim();
 
     try {
+      final deviceToken =
+          await PushNotificationService.instance.getToken() ?? '';
       final response = await _apiClient.post(
         '/user/login',
         {
           'UserName': email,
           'PassWord': _passwordController.text,
-          'Token': _deviceToken,
+          'Token': deviceToken,
           'Platform': _platform,
           'DeviceName': _deviceName,
         },
@@ -94,8 +95,9 @@ class _LoginScreenState extends State<LoginScreen> {
       final tokenId = data is Map<String, dynamic> ? data['TokenID'] : null;
 
       if (!response.isOk || tokenId is! String || tokenId.isEmpty) {
-        final message = _extractErrorMessage(body) ??
-          'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.';
+        final message =
+            _extractErrorMessage(body) ??
+            'Đăng nhập không thành công. Vui lòng kiểm tra lại thông tin.';
         throw Exception(message);
       }
 
@@ -147,7 +149,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'GB Lãnh Đạo',
+                          'ẤP THÔNG MINH',
                           style: AppTextStyles.h3.copyWith(
                             fontWeight: FontWeight.w900,
                           ),

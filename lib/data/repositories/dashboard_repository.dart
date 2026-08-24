@@ -65,10 +65,10 @@ class DashboardRepository {
     );
   }
 
-  Future<PeriodicReportBundle> getPeriodicReport() async {
+  Future<PeriodicReportBundle> getPeriodicReport({int typeSearch = 2}) async {
     final results = await Future.wait<dynamic>([
       _optional<PeriodReportSummary>(
-        () => _service.getPeriodSummary(typeSearch: 2),
+        () => _service.getPeriodSummary(typeSearch: typeSearch),
         PeriodReportSummary.empty(),
       ),
       _optional<List<PeriodTrendPoint>>(

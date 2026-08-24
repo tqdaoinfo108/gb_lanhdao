@@ -303,6 +303,61 @@ class ResidenceBundle {
   }
 }
 
+/// Hồ sơ biến động dân cư từ register-house-hold/get-list.
+/// API hiện không cung cấp endpoint danh mục loại biến động, vì vậy tên loại
+/// được đọc từ phản hồi (nếu có) và giao diện dùng hai mã nghiệp vụ 1/2.
+class RegisterHouseHoldItem {
+  final int registerHouseHoldId;
+  final int houseHoldId;
+  final int typeRegisterId;
+  final String typeRegisterName;
+  final String fullName;
+  final String description;
+  final int statusId;
+  final String statusName;
+
+  const RegisterHouseHoldItem({
+    required this.registerHouseHoldId,
+    required this.houseHoldId,
+    required this.typeRegisterId,
+    required this.typeRegisterName,
+    required this.fullName,
+    required this.description,
+    required this.statusId,
+    required this.statusName,
+  });
+
+  factory RegisterHouseHoldItem.fromJson(Map<String, dynamic> json) {
+    return RegisterHouseHoldItem(
+      registerHouseHoldId: _asInt(json['RegisterHouseHoldID']),
+      houseHoldId: _asInt(json['HouseHoldID']),
+      typeRegisterId: _asInt(json['TypeRegisterID']),
+      typeRegisterName: json['TypeRegisterName'] as String? ?? '',
+      fullName: json['FullName'] as String? ?? '',
+      description: json['Description'] as String? ?? '',
+      statusId: _asInt(json['StatusID']),
+      statusName: json['StatusName'] as String? ?? '',
+    );
+  }
+}
+
+class RegisterHouseHoldPage {
+  final int totals;
+  final List<RegisterHouseHoldItem> items;
+
+  const RegisterHouseHoldPage({required this.totals, required this.items});
+
+  factory RegisterHouseHoldPage.empty() =>
+      const RegisterHouseHoldPage(totals: 0, items: []);
+
+  factory RegisterHouseHoldPage.fromJson(Map<String, dynamic> json) {
+    return RegisterHouseHoldPage(
+      totals: _asInt(json['totals']),
+      items: _asList(json['data']).map(RegisterHouseHoldItem.fromJson).toList(),
+    );
+  }
+}
+
 int _asInt(dynamic value) {
   if (value == null) return 0;
   if (value is int) return value;

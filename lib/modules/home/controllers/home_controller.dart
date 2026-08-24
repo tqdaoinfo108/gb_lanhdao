@@ -25,6 +25,7 @@ import 'package:file_picker/file_picker.dart';
 import '../../../data/models/crime_report_models.dart';
 import '../../../data/services/file_upload_service.dart';
 import '../../../data/models/work_calendar_models.dart';
+import '../../../data/models/quality_report_models.dart';
 import '../../../data/repositories/agency_repository.dart';
 import '../../../data/repositories/ai_assistant_repository.dart';
 import '../../../data/repositories/dashboard_repository.dart';
@@ -38,6 +39,7 @@ import '../../../data/repositories/residence_repository.dart';
 import '../../../data/repositories/urgent_alert_repository.dart';
 import '../../../data/repositories/crime_report_repository.dart';
 import '../../../data/repositories/work_calendar_repository.dart';
+import '../../../data/repositories/quality_report_repository.dart';
 import '../../../data/models/booking_models.dart';
 
 enum AdminSmartView {
@@ -49,6 +51,7 @@ enum AdminSmartView {
   digitalMap,
   offices,
   residence,
+  residenceChange,
   documents,
   kpiPrograms,
   urgentAlerts,
@@ -64,9 +67,33 @@ enum AdminSmartView {
   accountNotificationDetail,
   accountSecurityDetail,
   accountSyncDetail,
+  qualityReport,
+  qualityYearReport,
 }
 
 enum WorkCalendarViewMode { day, week, month }
+
+enum ResidenceChangeType {
+  birth(1, 'Khai sinh', 'Thông báo có thành viên mới trong hộ gia đình'),
+  death(2, 'Báo tử', 'Thông báo một thành viên trong hộ gia đình đã mất');
+
+  final int typeRegisterId;
+  final String label;
+  final String description;
+
+  const ResidenceChangeType(this.typeRegisterId, this.label, this.description);
+}
+
+enum ReportPeriod {
+  week(0, 'Tuần này'),
+  month(1, 'Tháng này'),
+  quarter(2, 'Quý này');
+
+  final int typeSearch;
+  final String label;
+
+  const ReportPeriod(this.typeSearch, this.label);
+}
 
 class HomeController extends GetxController {
   final DashboardRepository _dashboardRepository;
@@ -82,6 +109,7 @@ class HomeController extends GetxController {
   UrgentAlertRepository? _urgentAlertRepository;
   CrimeReportRepository? _crimeReportRepository;
   final WorkCalendarRepository _workCalendarRepository;
+  QualityReportRepository? _qualityReportRepository;
 
   HomeController({
     DashboardRepository? dashboardRepository,
@@ -97,6 +125,7 @@ class HomeController extends GetxController {
     UrgentAlertRepository? urgentAlertRepository,
     CrimeReportRepository? crimeReportRepository,
     WorkCalendarRepository? workCalendarRepository,
+    QualityReportRepository? qualityReportRepository,
   }) : _dashboardRepository = dashboardRepository ?? DashboardRepository(),
        _processRepository = processRepository ?? ProcessRepository(),
        _agencyRepository = agencyRepository ?? AgencyRepository(),
@@ -111,7 +140,9 @@ class HomeController extends GetxController {
        _urgentAlertRepository = urgentAlertRepository,
        _crimeReportRepository = crimeReportRepository,
        _workCalendarRepository =
-           workCalendarRepository ?? WorkCalendarRepository();
+           workCalendarRepository ?? WorkCalendarRepository(),
+       _qualityReportRepository =
+           qualityReportRepository ?? QualityReportRepository();
 
   UrgentAlertRepository get _urgentAlerts =>
       _urgentAlertRepository ??= UrgentAlertRepository();
@@ -119,11 +150,25 @@ class HomeController extends GetxController {
   CrimeReportRepository get _crimeReports =>
       _crimeReportRepository ??= CrimeReportRepository();
 
+  QualityReportRepository get _qualityReports =>
+      _qualityReportRepository ??= QualityReportRepository();
+
   final currentView = AdminSmartView.overview.obs;
   final isDashboardLoading = false.obs;
   final dashboardError = RxnString();
   final dashboard = DashboardBundle.empty().obs;
   final periodicReport = PeriodicReportBundle.empty().obs;
+  final qualityReport = QualityReportBundle.empty().obs;
+  final qualityYearReport = QualityYearReportBundle.empty().obs;
+  final selectedReportPeriod = ReportPeriod.quarter.obs;
+  final qualityStartMonth = DateTime(DateTime.now().year, 1).obs;
+  final qualityEndMonth = DateTime(DateTime.now().year, 12, 31, 23, 59, 59).obs;
+  final selectedQualityTemplateId = RxnInt();
+  final selectedQualityUserId = 0.obs;
+  final selectedQualityStatusId = (-100).obs;
+  final selectedQualityYear = DateTime.now().year.obs;
+  final selectedQualityYearUserId = 0.obs;
+  final selectedQualityYearStatusId = (-100).obs;
   final meetingHub = MeetingHubBundle.empty().obs;
   final agencyBundle = AgencyBundle.empty().obs;
   final digitalMapBundle = DigitalMapBundle.empty().obs;
@@ -165,6 +210,8 @@ class HomeController extends GetxController {
   final selectedBooking = Rxn<BookingModel>();
 
   final isPeriodicReportLoading = false.obs;
+  final isQualityReportLoading = false.obs;
+  final isQualityYearReportLoading = false.obs;
   final isMeetingLoading = false.obs;
   final isAgencyLoading = false.obs;
   final isDigitalMapLoading = false.obs;
@@ -178,6 +225,8 @@ class HomeController extends GetxController {
   final isProcessCreating = false.obs;
   final isUrgentAlertLoading = false.obs;
   final periodicReportError = RxnString();
+  final qualityReportError = RxnString();
+  final qualityYearReportError = RxnString();
   final meetingError = RxnString();
   final agencyError = RxnString();
   final digitalMapError = RxnString();
@@ -199,6 +248,15 @@ class HomeController extends GetxController {
   final residenceVillageFilter = 0.obs;
   final residenceTypeFilter = 0.obs;
   final residenceStatusFilter = (-100).obs;
+  final selectedResidenceChangeType = Rxn<ResidenceChangeType>();
+  final residenceChangeError = RxnString();
+  final residenceChangeMessage = RxnString();
+  final registerHouseHoldPage = RegisterHouseHoldPage.empty().obs;
+  final isResidenceChangeLoading = false.obs;
+  final isResidenceChangeSaving = false.obs;
+  final isResidenceChangeFormOpen = false.obs;
+  final residenceChangeTypeFilter = 0.obs;
+  final editingRegisterHouseHold = Rxn<RegisterHouseHoldItem>();
   final documentTypeFilter = (-100).obs;
   final documentStatusFilter = (-100).obs;
   final documentFieldFilter = 0.obs;
@@ -245,6 +303,8 @@ class HomeController extends GetxController {
   final crimeSearchController = TextEditingController();
   final mapSearchController = TextEditingController();
   final residenceSearchController = TextEditingController();
+  final residenceChangeFullNameController = TextEditingController();
+  final residenceChangeDescriptionController = TextEditingController();
   final documentSearchController = TextEditingController();
   final kpiSearchController = TextEditingController();
   final urgentSearchController = TextEditingController();
@@ -358,6 +418,12 @@ class HomeController extends GetxController {
       final result = await _profileRepository.getProfile();
       profile.value = result;
       _syncProfileForm(result);
+
+      if (currentView.value == AdminSmartView.residenceChange &&
+          registerHouseHoldPage.value.items.isEmpty &&
+          !isResidenceChangeLoading.value) {
+        fetchResidenceChanges();
+      }
 
       // Save for upload headers
       await AuthHelper.saveUserInfo(
@@ -596,13 +662,103 @@ class HomeController extends GetxController {
     isPeriodicReportLoading.value = true;
     periodicReportError.value = null;
     try {
-      periodicReport.value = await _dashboardRepository.getPeriodicReport();
+      periodicReport.value = await _dashboardRepository.getPeriodicReport(
+        typeSearch: selectedReportPeriod.value.typeSearch,
+      );
     } catch (e) {
       periodicReportError.value = 'Không tải được báo cáo định kỳ: $e';
     } finally {
       isPeriodicReportLoading.value = false;
     }
   }
+
+  void selectReportPeriod(ReportPeriod period) {
+    if (selectedReportPeriod.value == period) return;
+    selectedReportPeriod.value = period;
+    fetchPeriodicReport();
+  }
+
+  Future<void> fetchQualityReport() async {
+    isQualityReportLoading.value = true;
+    qualityReportError.value = null;
+    try {
+      qualityReport.value = await _qualityReports.getBundle(
+        userId: selectedQualityUserId.value,
+        monthStart: qualityStartMonth.value,
+        monthEnd: qualityEndMonth.value,
+        statusId: selectedQualityStatusId.value,
+      );
+    } catch (e) {
+      qualityReportError.value = 'Không tải được báo cáo chất lượng: $e';
+    } finally {
+      isQualityReportLoading.value = false;
+    }
+  }
+
+  void setQualityTemplate(int? templateId) {
+    selectedQualityTemplateId.value = templateId;
+    final template = qualityReport.value.templates.where(
+      (item) => item.id == templateId,
+    );
+    if (template.isNotEmpty) {
+      final selected = template.first;
+      if (selected.start != null) qualityStartMonth.value = selected.start!;
+      if (selected.end != null) qualityEndMonth.value = selected.end!;
+    }
+  }
+
+  void setQualityUser(int userId) => selectedQualityUserId.value = userId;
+
+  void setQualityStatus(int statusId) =>
+      selectedQualityStatusId.value = statusId;
+
+  void setQualityStartMonth(DateTime date) {
+    qualityStartMonth.value = DateTime(date.year, date.month);
+    if (qualityEndMonth.value.isBefore(qualityStartMonth.value)) {
+      qualityEndMonth.value = DateTime(
+        date.year,
+        date.month + 1,
+        0,
+        23,
+        59,
+        59,
+      );
+    }
+  }
+
+  void setQualityEndMonth(DateTime date) => qualityEndMonth.value = DateTime(
+    date.year,
+    date.month + 1,
+    0,
+    23,
+    59,
+    59,
+  );
+
+  Future<void> fetchQualityYearReport() async {
+    isQualityYearReportLoading.value = true;
+    qualityYearReportError.value = null;
+    try {
+      qualityYearReport.value = await _qualityReports.getYearBundle(
+        userId: selectedQualityYearUserId.value,
+        year: selectedQualityYear.value,
+        statusId: selectedQualityYearStatusId.value,
+      );
+    } catch (e) {
+      qualityYearReportError.value =
+          'Không tải được báo cáo chất lượng theo năm: $e';
+    } finally {
+      isQualityYearReportLoading.value = false;
+    }
+  }
+
+  void setQualityYear(int year) => selectedQualityYear.value = year;
+
+  void setQualityYearUser(int userId) =>
+      selectedQualityYearUserId.value = userId;
+
+  void setQualityYearStatus(int statusId) =>
+      selectedQualityYearStatusId.value = statusId;
 
   Future<void> fetchMeetingHub() async {
     isMeetingLoading.value = true;
@@ -847,6 +1003,10 @@ class HomeController extends GetxController {
   }
 
   void showView(AdminSmartView view) {
+    if (view == AdminSmartView.residenceChange &&
+        currentView.value != AdminSmartView.residenceChange) {
+      closeResidenceChangeForm();
+    }
     currentView.value = view;
     if (view == AdminSmartView.aiAssistant &&
         aiHistory.value.items.isEmpty &&
@@ -881,6 +1041,11 @@ class HomeController extends GetxController {
         !isResidenceLoading.value) {
       fetchResidence();
     }
+    if (view == AdminSmartView.residenceChange &&
+        registerHouseHoldPage.value.items.isEmpty &&
+        !isResidenceChangeLoading.value) {
+      fetchResidenceChanges();
+    }
     if (view == AdminSmartView.documents &&
         documentBundle.value.documents.documents.isEmpty &&
         !isDocumentLoading.value) {
@@ -890,6 +1055,139 @@ class HomeController extends GetxController {
         officeBundle.value.officePage.offices.isEmpty &&
         !isOfficeLoading.value) {
       fetchOffices();
+    }
+    if (view == AdminSmartView.qualityReport &&
+        qualityReport.value.report.items.isEmpty &&
+        !isQualityReportLoading.value) {
+      fetchQualityReport();
+    }
+    if (view == AdminSmartView.qualityYearReport &&
+        qualityYearReport.value.report.items.isEmpty &&
+        !isQualityYearReportLoading.value) {
+      fetchQualityYearReport();
+    }
+  }
+
+  bool get isHouseholdUser {
+    final householdId = profile.value.householdId;
+    return householdId != null && householdId > 0;
+  }
+
+  void selectResidenceChangeType(ResidenceChangeType type) {
+    selectedResidenceChangeType.value = type;
+    residenceChangeError.value = null;
+  }
+
+  Future<void> fetchResidenceChanges() async {
+    isResidenceChangeLoading.value = true;
+    residenceChangeError.value = null;
+    try {
+      registerHouseHoldPage.value = await _residenceRepository
+          .getRegisterHouseHolds(
+            houseHoldId: profile.value.householdId ?? 0,
+            typeRegisterId: residenceChangeTypeFilter.value,
+          );
+    } catch (e) {
+      residenceChangeError.value = 'Không thể tải biến động dân cư: $e';
+    } finally {
+      isResidenceChangeLoading.value = false;
+    }
+  }
+
+  void setResidenceChangeTypeFilter(int typeRegisterId) {
+    residenceChangeTypeFilter.value = typeRegisterId;
+    fetchResidenceChanges();
+  }
+
+  void openResidenceChangeForm([RegisterHouseHoldItem? item]) {
+    editingRegisterHouseHold.value = item;
+    residenceChangeFullNameController.text = item?.fullName ?? '';
+    residenceChangeDescriptionController.text = item?.description ?? '';
+    selectedResidenceChangeType.value = item == null
+        ? null
+        : ResidenceChangeType.values
+              .where((type) => type.typeRegisterId == item.typeRegisterId)
+              .firstOrNull;
+    residenceChangeError.value = null;
+    residenceChangeMessage.value = null;
+    isResidenceChangeFormOpen.value = true;
+  }
+
+  void closeResidenceChangeForm() {
+    isResidenceChangeFormOpen.value = false;
+    editingRegisterHouseHold.value = null;
+    residenceChangeFullNameController.clear();
+    residenceChangeDescriptionController.clear();
+    selectedResidenceChangeType.value = null;
+    residenceChangeError.value = null;
+  }
+
+  Future<void> submitResidenceChange() async {
+    if (isResidenceChangeSaving.value) return;
+    final fullName = residenceChangeFullNameController.text.trim();
+    if (fullName.isEmpty) {
+      residenceChangeError.value =
+          'Vui lòng nhập họ và tên người được khai báo.';
+      return;
+    }
+    if (selectedResidenceChangeType.value == null) {
+      residenceChangeError.value = 'Vui lòng chọn loại biến động dân cư.';
+      return;
+    }
+
+    final houseHoldId = profile.value.householdId ?? 0;
+    final editing = editingRegisterHouseHold.value;
+    if (editing == null && houseHoldId <= 0) {
+      residenceChangeError.value =
+          'Không xác định được hộ gia đình. Vui lòng cập nhật hồ sơ trước.';
+      return;
+    }
+
+    isResidenceChangeSaving.value = true;
+    residenceChangeError.value = null;
+    try {
+      final selectedType = selectedResidenceChangeType.value!;
+      if (editing == null) {
+        await _residenceRepository.createRegisterHouseHold(
+          houseHoldId: houseHoldId,
+          typeRegisterId: selectedType.typeRegisterId,
+          fullName: fullName,
+          description: residenceChangeDescriptionController.text.trim(),
+        );
+      } else {
+        await _residenceRepository.updateRegisterHouseHold(
+          registerHouseHoldId: editing.registerHouseHoldId,
+          typeRegisterId: selectedType.typeRegisterId,
+          fullName: fullName,
+          description: residenceChangeDescriptionController.text.trim(),
+        );
+      }
+      residenceChangeMessage.value = editing == null
+          ? 'Đã gửi khai báo biến động dân cư.'
+          : 'Đã cập nhật khai báo biến động dân cư.';
+      closeResidenceChangeForm();
+      await fetchResidenceChanges();
+    } catch (e) {
+      residenceChangeError.value = 'Không thể lưu khai báo: $e';
+    } finally {
+      isResidenceChangeSaving.value = false;
+    }
+  }
+
+  Future<void> deleteResidenceChange(RegisterHouseHoldItem item) async {
+    if (isResidenceChangeSaving.value) return;
+    isResidenceChangeSaving.value = true;
+    residenceChangeError.value = null;
+    try {
+      await _residenceRepository.deleteRegisterHouseHold(
+        item.registerHouseHoldId,
+      );
+      residenceChangeMessage.value = 'Đã xóa khai báo của ${item.fullName}.';
+      await fetchResidenceChanges();
+    } catch (e) {
+      residenceChangeError.value = 'Không thể xóa khai báo: $e';
+    } finally {
+      isResidenceChangeSaving.value = false;
     }
   }
 
@@ -980,6 +1278,11 @@ class HomeController extends GetxController {
   }
 
   Future<void> confirmCreateCrimeReport() async {
+    if (isUploading.value) {
+      crimeFormError.value = 'Vui lòng chờ tải file hoàn tất trước khi gửi.';
+      return;
+    }
+
     final analysis = crimeAiAnalysis.value;
     if (analysis == null) {
       await analyzeCrimeReport();
@@ -1157,10 +1460,13 @@ class HomeController extends GetxController {
       case AdminSmartView.digitalMap:
       case AdminSmartView.offices:
       case AdminSmartView.residence:
+      case AdminSmartView.residenceChange:
       case AdminSmartView.documents:
       case AdminSmartView.kpiPrograms:
       case AdminSmartView.urgentAlerts:
       case AdminSmartView.periodicReport:
+      case AdminSmartView.qualityReport:
+      case AdminSmartView.qualityYearReport:
       case AdminSmartView.meetingSchedule:
       case AdminSmartView.workCalendar:
       case AdminSmartView.workCalendarDetail:
@@ -1545,6 +1851,8 @@ class HomeController extends GetxController {
     agencySearchController.dispose();
     officeSearchController.dispose();
     residenceSearchController.dispose();
+    residenceChangeFullNameController.dispose();
+    residenceChangeDescriptionController.dispose();
     documentSearchController.dispose();
     aiPromptController.dispose();
     _aiSocketSubscription?.cancel();
@@ -1745,17 +2053,36 @@ class HomeController extends GetxController {
   }
 
   Future<void> pickAndUploadCrimeAttachment() async {
+    if (isUploading.value) return;
     try {
       final result = await FilePicker.pickFiles(allowMultiple: true);
       if (result != null && result.files.isNotEmpty) {
         isUploading.value = true;
         final service = FileUploadService();
+        var uploadedCount = 0;
+        final errors = <String>[];
         for (final picked in result.files) {
           if (picked.path == null) continue;
-          final path = await service.uploadFile(File(picked.path!));
-          if (path.isNotEmpty && !crimeAttachmentPaths.contains(path)) {
-            crimeAttachmentPaths.add(path);
+          try {
+            final path = await service.uploadFile(File(picked.path!));
+            if (path.isNotEmpty && !crimeAttachmentPaths.contains(path)) {
+              // assignAll đảm bảo Obx nhận thay đổi ngay cả trong luồng async.
+              crimeAttachmentPaths.assignAll([...crimeAttachmentPaths, path]);
+              uploadedCount++;
+            }
+          } catch (e) {
+            errors.add('${picked.name}: $e');
           }
+        }
+        if (uploadedCount > 0) {
+          Get.snackbar(
+            'Đã tải tệp',
+            '$uploadedCount tệp đã được thêm vào phản ánh.',
+            snackPosition: SnackPosition.BOTTOM,
+          );
+        }
+        if (errors.isNotEmpty) {
+          throw Exception(errors.join('\n'));
         }
       }
     } catch (e) {

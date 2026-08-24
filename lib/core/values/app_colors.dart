@@ -8,9 +8,9 @@ class AppColors {
   // ---------------------------------------------------------------------------
   // Primary
   // ---------------------------------------------------------------------------
-  static const Color primaryBlue     = Color(0xFF2F80ED);
-  static const Color primaryBlueDark = Color(0xFF175CD3);
-  static const Color primaryBlueLight = Color(0xFFEBF3FE);
+  static const Color primaryBlue      = Color(0xFF009947);
+  static const Color primaryBlueDark  = Color(0xFF007A39);
+  static const Color primaryBlueLight = Color(0xFFE6F5EC);
 
   // ---------------------------------------------------------------------------
   // Status

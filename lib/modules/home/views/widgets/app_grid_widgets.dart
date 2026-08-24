@@ -140,6 +140,30 @@ class _AppGridTile extends StatelessWidget {
                           ),
                         ),
                       ),
+                    if (item.isInDevelopment)
+                      Positioned(
+                        top: -6,
+                        right: -24,
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 5,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: SmartColors.warning,
+                            borderRadius: BorderRadius.circular(999),
+                          ),
+                          child: Text(
+                            'Đang phát triển',
+                            style: AppTextStyles.caption.copyWith(
+                              color: AppColors.textPrimary,
+                              fontSize: 8,
+                              fontWeight: FontWeight.w800,
+                              height: 1,
+                            ),
+                          ),
+                        ),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 8),

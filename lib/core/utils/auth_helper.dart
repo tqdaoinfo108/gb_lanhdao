@@ -9,6 +9,7 @@ class AuthHelper {
   static const String _userIdKey = AppConstants.keyUserId;
   static const String _userNameKey = AppConstants.keyUserName;
   static const String _userTypeIdKey = AppConstants.keyUserTypeId;
+  static const String _fcmTokenKey = 'fcm_token';
 
   /// Lưu token vào storage.
   static Future<void> saveToken(String token) async {
@@ -21,7 +22,11 @@ class AuthHelper {
   }
 
   /// Lưu thông tin user (để gửi kèm header upload).
-  static Future<void> saveUserInfo(int userId, String userName, int userTypeId) async {
+  static Future<void> saveUserInfo(
+    int userId,
+    String userName,
+    int userTypeId,
+  ) async {
     await _storage.write(_userIdKey, userId);
     await _storage.write(_userNameKey, userName);
     await _storage.write(_userTypeIdKey, userTypeId);
@@ -30,6 +35,12 @@ class AuthHelper {
   static int? getUserId() => _storage.read<int>(_userIdKey);
   static String? getUserName() => _storage.read<String>(_userNameKey);
   static int? getUserTypeId() => _storage.read<int>(_userTypeIdKey);
+
+  static Future<void> saveFcmToken(String token) async {
+    await _storage.write(_fcmTokenKey, token);
+  }
+
+  static String? getFcmToken() => _storage.read<String>(_fcmTokenKey);
 
   /// Xóa token và user info khỏi storage.
   static Future<void> clearToken() async {

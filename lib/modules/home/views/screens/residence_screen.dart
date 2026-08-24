@@ -17,7 +17,7 @@ class _ResidenceScreen extends StatelessWidget {
             backLabel: 'Ứng dụng',
             onBack: () => controller.showView(AdminSmartView.apps),
             eyebrow: 'Quản lý hộ khẩu và nhân khẩu',
-            title: 'Dân cư & Hộ gia đình',
+            title: 'Hộ dân cư',
             badge: '${households.length} hộ',
             actionLabel: 'Làm mới',
             onAction: controller.fetchResidence,

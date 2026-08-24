@@ -25,8 +25,9 @@ class _CrimeReportsScreen extends StatelessWidget {
           SmartScreenHeader(
             backLabel: 'Ứng dụng',
             onBack: () => controller.showView(AdminSmartView.apps),
-            eyebrow: 'Tiếp nhận',
-            title: 'Tố giác tội phạm',
+            eyebrow: 'Tiếp nhận & xử lý',
+            title: 'Phản ánh - Kiến nghị',
+            badge: 'Đang phát triển',
             actionLabel: controller.isCrimeReportLoading.value
                 ? 'Đang tải...'
                 : 'Nộp đơn',
@@ -254,7 +255,7 @@ class _CrimeReportList extends StatelessWidget {
             const Padding(
               padding: EdgeInsets.all(24),
               child: _EmptyState(
-                title: 'Chưa có đơn tố giác',
+                title: 'Chưa có phản ánh hoặc kiến nghị',
                 note: 'Thử đổi từ khóa hoặc bộ lọc để xem thêm.',
               ),
             )
@@ -915,7 +916,7 @@ class _CrimeReportNewScreen extends StatelessWidget {
             backLabel: 'Tố giác',
             onBack: () => controller.showView(AdminSmartView.crimeReports),
             eyebrow: 'Hồ sơ mới',
-            title: 'Nộp đơn tố giác / khiếu nại',
+            title: 'Gửi phản ánh / kiến nghị',
             badge: analysis == null ? 'Bảo mật' : 'Xác nhận',
           ),
           if (controller.crimeFormError.value != null)
@@ -1080,132 +1081,145 @@ class _CrimeReportConfirm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // AI Badge header
-        Container(
-          width: double.infinity,
-          padding: const EdgeInsets.all(18),
-          decoration: BoxDecoration(
-            gradient: const LinearGradient(
-              colors: [SmartColors.accent, Color(0xFF1E48B4)],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
+    return Obx(
+      () => Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // AI Badge header
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              gradient: const LinearGradient(
+                colors: [SmartColors.accent, Color(0xFF1E48B4)],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: SmartColors.accent.withValues(alpha: 0.3),
+                  blurRadius: 16,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: SmartColors.accent.withValues(alpha: 0.3),
-                blurRadius: 16,
-                offset: const Offset(0, 8),
-              ),
-            ],
-          ),
-          child: Row(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
+            child: Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(
+                    Icons.auto_awesome_rounded,
+                    color: Colors.white,
+                    size: 26,
+                  ),
                 ),
-                child: const Icon(
-                  Icons.auto_awesome_rounded,
-                  color: Colors.white,
-                  size: 26,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'AI đã phân tích nội dung',
-                      style: AppTextStyles.caption.copyWith(
-                        color: Colors.white.withValues(alpha: 0.85),
-                        fontWeight: FontWeight.w600,
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'AI đã phân tích nội dung',
+                        style: AppTextStyles.caption.copyWith(
+                          color: Colors.white.withValues(alpha: 0.85),
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Độ tin cậy: ${analysis.aiAnalysis}%',
-                      style: AppTextStyles.h2.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
+                      const SizedBox(height: 4),
+                      Text(
+                        'Độ tin cậy: ${analysis.aiAnalysis}%',
+                        style: AppTextStyles.h2.copyWith(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        const SizedBox(height: 20),
-
-        // Unified Details Container
-        Container(
-          decoration: BoxDecoration(
-            color: SmartColors.surface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: SmartColors.border),
-            boxShadow: [
-              BoxShadow(
-                color: SmartColors.border.withValues(alpha: 0.4),
-                blurRadius: 20,
-                offset: const Offset(0, 6),
-              ),
-            ],
-          ),
-          child: Column(
-            children: [
-              _CrimeConfirmDetailRow(
-                label: 'Loại tố giác',
-                value: controller.crimeTypeNameForCreate(analysis),
-              ),
-              _CrimeConfirmDetailRow(
-                label: 'Phòng ban xử lý',
-                value: controller.crimeDepartmentNameForCreate(analysis),
-              ),
-              _CrimeConfirmDetailRow(
-                label: 'Mức độ',
-                value: controller.crimeLevelNameForCreate(analysis),
-                tone: _crimeLevelToneForId(analysis.levelId),
-              ),
-              _CrimeConfirmDetailRow(
-                label: 'Mã dự kiến',
-                value: 'TG-${DateTime.now().year}-******',
-                isLast: true,
-              ),
-            ],
-          ),
-        ),
-
-        const SizedBox(height: 24),
-        Row(
-          children: [
-            Expanded(
-              child: SmartPrimaryButton(
-                label: 'Sửa lại',
-                secondary: true,
-                onTap: controller.editCrimeReportForm,
-              ),
+              ],
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: SmartPrimaryButton(
-                label: controller.isCrimeSubmitting.value
-                    ? 'Đang nộp...'
-                    : 'Xác nhận nộp',
-                onTap: controller.isCrimeSubmitting.value
-                    ? null
-                    : controller.confirmCreateCrimeReport,
-              ),
+          ),
+          const SizedBox(height: 20),
+
+          // Unified Details Container
+          Container(
+            decoration: BoxDecoration(
+              color: SmartColors.surface,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: SmartColors.border),
+              boxShadow: [
+                BoxShadow(
+                  color: SmartColors.border.withValues(alpha: 0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 6),
+                ),
+              ],
             ),
+            child: Column(
+              children: [
+                _CrimeConfirmDetailRow(
+                  label: 'Loại tố giác',
+                  value: controller.crimeTypeNameForCreate(analysis),
+                ),
+                _CrimeConfirmDetailRow(
+                  label: 'Phòng ban xử lý',
+                  value: controller.crimeDepartmentNameForCreate(analysis),
+                ),
+                _CrimeConfirmDetailRow(
+                  label: 'Mức độ',
+                  value: controller.crimeLevelNameForCreate(analysis),
+                  tone: _crimeLevelToneForId(analysis.levelId),
+                ),
+                _CrimeConfirmDetailRow(
+                  label: 'Mã dự kiến',
+                  value: 'TG-${DateTime.now().year}-******',
+                  isLast: true,
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 24),
+          if (controller.crimeAttachmentPaths.isNotEmpty) ...[
+            SmartSectionHeader(
+              title: 'Tệp đính kèm',
+              actionLabel: '${controller.crimeAttachmentPaths.length}',
+            ),
+            const SizedBox(height: 8),
+            _CrimeAttachmentList(controller: controller),
+            const SizedBox(height: 16),
           ],
-        ),
-      ],
+          Row(
+            children: [
+              Expanded(
+                child: SmartPrimaryButton(
+                  label: 'Sửa lại',
+                  secondary: true,
+                  onTap: controller.editCrimeReportForm,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: SmartPrimaryButton(
+                  label: controller.isCrimeSubmitting.value
+                      ? 'Đang nộp...'
+                      : 'Xác nhận nộp',
+                  onTap:
+                      controller.isCrimeSubmitting.value ||
+                          controller.isUploading.value
+                      ? null
+                      : controller.confirmCreateCrimeReport,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1322,50 +1336,58 @@ class _CrimeAttachmentList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (controller.crimeAttachmentPaths.isEmpty) {
-      return const SizedBox.shrink();
-    }
-    return Column(
-      children: controller.crimeAttachmentPaths
-          .map(
-            (path) => Container(
-              margin: const EdgeInsets.only(bottom: 7),
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-              decoration: BoxDecoration(
-                color: SmartColors.surface,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: SmartColors.border),
-              ),
-              child: Row(
-                children: [
-                  const Icon(
-                    Icons.insert_drive_file_outlined,
-                    size: 16,
-                    color: AppColors.textSecondary,
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      path.split(RegExp(r'[\\/]')).last,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textPrimary,
-                        fontWeight: FontWeight.w700,
+    return Obx(() {
+      final paths = controller.crimeAttachmentPaths.toList(growable: false);
+      if (paths.isEmpty) {
+        return const SizedBox.shrink();
+      }
+
+      return Column(
+        children: paths
+            .map(
+              (path) => Container(
+                key: ValueKey(path),
+                margin: const EdgeInsets.only(bottom: 7),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 8,
+                ),
+                decoration: BoxDecoration(
+                  color: SmartColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: SmartColors.border),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(
+                      Icons.insert_drive_file_outlined,
+                      size: 16,
+                      color: AppColors.textSecondary,
+                    ),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        path.split(RegExp(r'[\\/]')).last,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: AppTextStyles.caption.copyWith(
+                          color: AppColors.textPrimary,
+                          fontWeight: FontWeight.w700,
+                        ),
                       ),
                     ),
-                  ),
-                  IconButton(
-                    visualDensity: VisualDensity.compact,
-                    onPressed: () => controller.removeCrimeAttachment(path),
-                    icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                  ),
-                ],
+                    IconButton(
+                      visualDensity: VisualDensity.compact,
+                      onPressed: () => controller.removeCrimeAttachment(path),
+                      icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                    ),
+                  ],
+                ),
               ),
-            ),
-          )
-          .toList(),
-    );
+            )
+            .toList(),
+      );
+    });
   }
 }
 
@@ -1376,48 +1398,49 @@ class _CrimeUploadBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: controller.isUploading.value
-          ? null
-          : controller.pickAndUploadCrimeAttachment,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-        decoration: BoxDecoration(
-          color: SmartColors.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: SmartColors.border),
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              controller.isUploading.value
-                  ? Icons.cloud_sync_outlined
-                  : Icons.cloud_upload_outlined,
-              size: 18,
-              color: AppColors.textSecondary,
-            ),
-            const SizedBox(width: 8),
-            Flexible(
-              child: Text(
-                controller.isUploading.value
-                    ? 'Đang tải lên...'
-                    : 'Bấm để tải tệp hình ảnh, bằng chứng',
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-                textAlign: TextAlign.center,
-                style: AppTextStyles.caption.copyWith(
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w800,
+    return Obx(() {
+      final isUploading = controller.isUploading.value;
+      return InkWell(
+        onTap: isUploading ? null : controller.pickAndUploadCrimeAttachment,
+        borderRadius: BorderRadius.circular(16),
+        child: Container(
+          width: double.infinity,
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+          decoration: BoxDecoration(
+            color: SmartColors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(color: SmartColors.border),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                isUploading
+                    ? Icons.cloud_sync_outlined
+                    : Icons.cloud_upload_outlined,
+                size: 18,
+                color: AppColors.textSecondary,
+              ),
+              const SizedBox(width: 8),
+              Flexible(
+                child: Text(
+                  isUploading
+                      ? 'Đang tải lên...'
+                      : 'Bấm để tải tệp hình ảnh, bằng chứng',
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  textAlign: TextAlign.center,
+                  style: AppTextStyles.caption.copyWith(
+                    color: AppColors.textSecondary,
+                    fontWeight: FontWeight.w800,
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
-      ),
-    );
+      );
+    });
   }
 }
 

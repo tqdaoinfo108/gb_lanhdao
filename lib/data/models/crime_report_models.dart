@@ -250,7 +250,10 @@ class WarningCreateRequest {
       'IsVisible': isVisible,
       'AIAnalysis': aiAnalysis,
       'Description': description,
+      // API tạo mới dùng lstAttachment; một số phiên bản backend đọc theo
+      // tên collection trả về là lstWarningAttachment.
       'lstAttachment': attachments,
+      'lstWarningAttachment': attachments,
     };
   }
 }

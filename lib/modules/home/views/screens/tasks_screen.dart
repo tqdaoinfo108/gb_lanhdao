@@ -24,8 +24,8 @@ class _UrgentAlertsScreen extends StatelessWidget {
           SmartScreenHeader(
             backLabel: 'Ứng dụng',
             onBack: () => controller.showView(AdminSmartView.apps),
-            eyebrow: 'Khẩn cấp',
-            title: 'Thông báo khẩn',
+            eyebrow: 'Điều hành',
+            title: 'Thông báo',
             actionLabel: controller.isUrgentAlertLoading.value
                 ? 'Đang tải...'
                 : 'Làm mới',
@@ -867,10 +867,10 @@ class _TasksScreen extends StatelessWidget {
       return _ScreenStack(
         children: [
           SmartScreenHeader(
-            backLabel: 'Giao việc',
-            onBack: () => controller.showView(AdminSmartView.tasks),
+            backLabel: 'Ứng dụng',
+            onBack: () => controller.showView(AdminSmartView.apps),
             eyebrow: 'Nghiệp vụ',
-            title: 'Giao việc & Kết luận',
+            title: 'Quản lý công việc',
             badge: '${processes.length} việc',
             actionLabel: 'Tạo mới',
             onAction: controller.openProcessCreate,

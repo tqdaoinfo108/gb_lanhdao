@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "589341633950",
+    "project_id": "web-leaderdashboard",
+    "storage_bucket": "web-leaderdashboard.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:589341633950:android:e2d660248e37c21d24ba8f",
+        "android_client_info": {
+          "package_name": "vn.gbsoft.lanhdao"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB9HCLDEClEYajnik8tVJOK_lAXpZwjaYo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

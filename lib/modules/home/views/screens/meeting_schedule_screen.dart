@@ -19,8 +19,8 @@ class _MeetingScheduleScreen extends StatelessWidget {
       return _ScreenStack(
         children: [
           SmartScreenHeader(
-            eyebrow: 'Không giấy tờ',
-            title: 'Họp không giấy tờ',
+            eyebrow: 'Quản lý cuộc họp',
+            title: 'Lịch họp',
             badge: '${bundle.rooms.totals} phòng',
             actionLabel: 'Làm mới',
             onAction: controller.fetchMeetingHub,

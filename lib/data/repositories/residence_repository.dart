@@ -30,4 +30,43 @@ class ResidenceRepository {
       types: results[2] as HouseholdTypePage,
     );
   }
+
+  Future<RegisterHouseHoldPage> getRegisterHouseHolds({
+    int villageId = 0,
+    int houseHoldId = 0,
+    int statusId = -100,
+    int typeRegisterId = 0,
+  }) => _service.getRegisterHouseHolds(
+    villageId: villageId,
+    houseHoldId: houseHoldId,
+    statusId: statusId,
+    typeRegisterId: typeRegisterId,
+  );
+
+  Future<void> createRegisterHouseHold({
+    required int houseHoldId,
+    required int typeRegisterId,
+    required String fullName,
+    required String description,
+  }) => _service.createRegisterHouseHold(
+    houseHoldId: houseHoldId,
+    typeRegisterId: typeRegisterId,
+    fullName: fullName,
+    description: description,
+  );
+
+  Future<void> updateRegisterHouseHold({
+    required int registerHouseHoldId,
+    required int typeRegisterId,
+    required String fullName,
+    required String description,
+  }) => _service.updateRegisterHouseHold(
+    registerHouseHoldId: registerHouseHoldId,
+    typeRegisterId: typeRegisterId,
+    fullName: fullName,
+    description: description,
+  );
+
+  Future<void> deleteRegisterHouseHold(int registerHouseHoldId) =>
+      _service.deleteRegisterHouseHold(registerHouseHoldId);
 }
